@@ -46,7 +46,7 @@ Captures générées en **mode démo**, avec les données et les visuels de seco
 | Styles | CSS modulaire + Tailwind CSS v4 |
 | Paiement | Tebex Headless API + Tebex.js |
 | Panier | Cookie httpOnly, sans base de données |
-| Déploiement | Vercel (ou tout hôte Node.js 20.9+) |
+| Déploiement | Vercel ou serveur auto-hébergé (Node.js 20.9+) — voir docs/ovh-rise-s-setup.md |
 
 ## Démarrage rapide
 
@@ -148,7 +148,7 @@ Après avoir ajouté le token, redémarre le serveur. Le badge “Démo” dispa
    - livraison Minecraft configurée.
 5. Configurer les moyens de paiement et la livraison en jeu (plugin/RCON Tebex).
 6. Récupérer le **public token** dans Creator Panel → Developers → API Keys.
-7. Ajouter le token dans `.env.local` ou dans les variables d’environnement Vercel.
+7. Ajouter le token dans `.env.local` ou dans les variables d’environnement de l’hébergeur (Vercel ou OVHcloud).
 8. Tester un achat réel avec un petit package avant l’ouverture publique.
 
 ### Packages populaires
@@ -182,12 +182,16 @@ Les packages de type `subscription` affichent “S’abonner”. Tebex gère la 
 
 | Sous-domaine | Usage |
 |---|---|
-| `tbnk-smp.com` | Site Next.js (Vercel) |
+| `tbnk-smp.com` | Site Next.js (Vercel ou OVHcloud) |
 | `www.tbnk-smp.com` | Redirection vers l’apex |
 | `play.tbnk-smp.com` | Serveur Minecraft Java (DNS serveur, plus tard) |
 | `store.tbnk-smp.com` | Optionnel : page Tebex hébergée |
 
 Le statut du serveur restera sur **“En préparation”** tant que `play.tbnk-smp.com` n’a pas d’enregistrement DNS public et que le serveur n’est pas en ligne. Le site fonctionne quand même.
+
+### Hébergement auto-hébergé (OVHcloud)
+
+Pour héberger le site et le serveur Minecraft sur un serveur dédié OVHcloud Rise-S, consulte le guide complet : [docs/ovh-rise-s-setup.md](docs/ovh-rise-s-setup.md).
 
 ### Build local
 
@@ -386,7 +390,7 @@ Si Edge n’est pas au chemin par défaut, définis `EDGE_PATH`.
    - le checkout Tebex s’ouvre ;
    - un petit achat de test est livré en jeu.
 7. Vérifier les pages légales et le footer Tebex.
-8. Vérifier le domaine et le HTTPS sur Vercel.
+8. Vérifier le domaine et le HTTPS sur Vercel ou OVHcloud.
 ## Sécurité
 
 - Le **public token** Tebex est utilisé côté serveur. Le private key n’est jamais présent dans le code.
@@ -422,7 +426,7 @@ Si Edge n’est pas au chemin par défaut, définis `EDGE_PATH`.
 - [ ] Boutique Tebex créée, catégories et packages publiés.
 - [ ] Devise CAD configurée dans Tebex.
 - [ ] Livraison Minecraft testée.
-- [ ] `TEBEX_PUBLIC_TOKEN` ajouté sur Vercel.
+- [ ] `TEBEX_PUBLIC_TOKEN` ajouté chez l’hébergeur (Vercel ou OVHcloud).
 - [ ] `NEXT_PUBLIC_SITE_URL=https://tbnk-smp.com`.
 - [ ] Domaine et DNS configurés ; `play.tbnk-smp.com` réservé au serveur.
 - [ ] Achat test effectué et livré.

@@ -51,15 +51,15 @@ export const privacy: LegalPage = {
     <p>Aucun outil de mesure d’audience ou de publicité n’est utilisé à ce jour. S’il est ajouté, il sera soumis au consentement préalable.</p>
 
     <h2>6. Tiers et communication hors Québec</h2>
-    <p>Certains prestataires peuvent traiter des renseignements à l’extérieur du Québec :</p>
+    <p>Le site est hébergé par OVHcloud au Québec (Beauharnois). Les prestataires suivants peuvent traiter des renseignements à l’extérieur du Québec :</p>
     <ul>
       <li><strong>Tebex</strong> — paiement, taxes, remboursements et livraison ;</li>
-      <li><strong>Vercel</strong> — hébergement et journaux techniques ;</li>
       <li><strong>Discord</strong> — communauté et support, si tu rejoins le serveur ;</li>
       <li><strong>mc-heads.net</strong> — avatars Minecraft, avec consentement ;</li>
       <li><strong>mcsrvstat.us</strong> — statut public du serveur ;</li>
       <li><strong>YouTube/Google</strong> — vidéos, avec consentement.</li>
     </ul>
+    <p>OVHcloud agit comme hébergeur et sous-traitant pour les journaux techniques au Québec.</p>
     <p>Avant toute communication hors Québec, une évaluation des facteurs relatifs à la vie privée (EFVP) est réalisée et des mesures contractuelles raisonnables sont recherchées. Les liens vers leurs politiques sont fournis ci-dessus lorsque disponible.</p>
 
     <h2>7. Conservation et destruction</h2>

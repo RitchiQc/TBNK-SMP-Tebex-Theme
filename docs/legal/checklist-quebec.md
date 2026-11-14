@@ -41,7 +41,7 @@ Source : [OPC — Renseignements à donner avant un contrat à distance](https:/
 - [ ] Tenir un registre des incidents de confidentialité.
 - [ ] Prévoir une procédure de réponse aux demandes de droits (30 jours).
 - [ ] Réaliser une EFVP pour le site et pour les transferts hors Québec
-      (Vercel, Tebex, Discord, mc-heads, mcsrvstat, YouTube).
+      (hébergeur — Vercel ou OVHcloud —, Tebex, Discord, mc-heads, mcsrvstat, YouTube).
 - [ ] Prévoir le consentement parental pour les mineurs de moins de 14 ans.
 - [ ] Documenter les mesures de sécurité et les accès aux données.
 
@@ -140,9 +140,11 @@ Sources :
 ## 8. Sécurité et exploitation
 
 - [ ] `APP_ENV=production`, `TEBEX_PUBLIC_TOKEN`, `NEXT_PUBLIC_SITE_URL`,
-      `COOKIE_SECRET` et contacts de confidentialité configurés dans Vercel.
+      `COOKIE_SECRET` et contacts de confidentialité configurés chez l’hébergeur (Vercel ou OVHcloud).
 - [ ] `ALLOW_DEMO` absent ou `false` en production.
-- [ ] Preview Vercel protégée par Deployment Protection et `noindex`.
-- [ ] Token Tebex de test séparé pour les previews.
+- [ ] Si OVHcloud au Québec : mettre à jour la politique de confidentialité,
+      l’EFVP et la liste des tiers (hébergement Beauharnois, Canada).
+- [ ] Preview/staging protégé (Vercel Deployment Protection ou accès restreint OVHcloud) et `noindex`.
+- [ ] Token Tebex de test séparé pour les previews/staging.
 - [ ] Sauvegarde/rollback et alertes de disponibilité.
 - [ ] Procédure d'incident de confidentialité et de sécurité.
