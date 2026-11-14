@@ -78,6 +78,10 @@ export async function SiteFooter() {
                   "Courriel à compléter"
                 )}
               </span>
+              <span>
+                Responsable de la protection des renseignements personnels :{" "}
+                {siteConfig.privacyOfficer || "Responsable à désigner"}
+              </span>
             </div>
           </div>
 

@@ -93,7 +93,7 @@ NEXT_PUBLIC_SITE_URL="http://localhost:3000"
 - `NEXT_PUBLIC_SITE_URL` : URL publique du site, sans slash final. En production : `https://tbnk-smp.com`.
 - `APP_ENV` : `development`, `preview` ou `production`. Sur Vercel, `VERCEL_ENV` est utilisé si `APP_ENV` est absent.
 - `COOKIE_SECRET` : secret de signature des cookies, **obligatoire en production** (32 caractères minimum). Génère-le avec `openssl rand -base64 48`.
-- `NEXT_PUBLIC_LEGAL_*`, `NEXT_PUBLIC_SUPPORT_EMAIL`, `NEXT_PUBLIC_PRIVACY_EMAIL`, `NEXT_PUBLIC_PRIVACY_OFFICER` : identité légale et contacts **obligatoires en production** pour la LPC et la Loi 25.
+- `NEXT_PUBLIC_LEGAL_*`, `NEXT_PUBLIC_SUPPORT_EMAIL`, `NEXT_PUBLIC_PRIVACY_EMAIL`, `NEXT_PUBLIC_PRIVACY_OFFICER` : identité légale et contacts **obligatoires en production** pour la LPC et la Loi 25. `NEXT_PUBLIC_PRIVACY_OFFICER` attend le **titre/fonction** du responsable (le nom personnel n'est pas requis).
 - `NEXT_PUBLIC_PRICES_INCLUDE_TAXES` : `true` si les prix Tebex incluent déjà les taxes, sinon `false`.
 
 ### Environnements et mode démo
@@ -116,7 +116,7 @@ Règles importantes :
 
 Avant une ouverture publique au Québec :
 
-- désigner un **responsable de la protection des renseignements personnels** et publier ses coordonnées ;
+- désigner un **responsable de la protection des renseignements personnels** et publier son **titre et ses coordonnées** (art. 3.1 P-39.1 : le nom personnel n'est pas exigé) ;
 - compléter la politique de confidentialité (finalités, droits, témoins, tiers, transferts hors Québec, incidents, mineurs de moins de 14 ans, plainte CAI) ;
 - recueillir un **consentement explicite** pour les témoins non nécessaires (YouTube, avatars mc-heads) et permettre le retrait à tout moment ;
 - fournir l’identité, l’adresse, le téléphone et le courriel du commerçant avant l’achat ;

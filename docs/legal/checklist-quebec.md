@@ -10,7 +10,9 @@
 - [ ] `NEXT_PUBLIC_LEGAL_PHONE` : téléphone.
 - [ ] `NEXT_PUBLIC_SUPPORT_EMAIL` : courriel de support.
 - [ ] `NEXT_PUBLIC_PRIVACY_EMAIL` : courriel pour les demandes de confidentialité.
-- [ ] `NEXT_PUBLIC_PRIVACY_OFFICER` : nom/fonction du responsable Loi 25.
+- [ ] `NEXT_PUBLIC_PRIVACY_OFFICER` : titre/fonction du responsable Loi 25.
+      L'art. 3.1 P-39.1 exige de publier le titre et les coordonnées : le nom
+      personnel n'est pas requis (ex. : « Administrateur principal – TBNK-SMP »).
 - [ ] Vérifier que ces informations apparaissent au footer, dans les conditions
       et dans la page contact avant le paiement.
 
@@ -18,7 +20,12 @@ Source : [OPC — Renseignements à donner avant un contrat à distance](https:/
 
 ## 2. Loi 25 — gouvernance et transparence
 
-- [ ] Désigner formellement le responsable de la protection des renseignements personnels.
+- [ ] Désigner formellement le responsable de la protection des renseignements
+      personnels (par défaut, la personne ayant la plus haute autorité ;
+      délégation par écrit seulement).
+- [ ] Publier le titre et les coordonnées du responsable sur le site Web
+      (une boîte générique comme tbnksmp@gmail.com suffit si elle est
+      réellement surveillée ; le nom personnel n'est pas exigé).
 - [ ] Publier la politique de confidentialité complète, claire et datée.
 - [ ] Rédiger une politique interne de gouvernance (conservation, destruction,
       rôles, plaintes).
