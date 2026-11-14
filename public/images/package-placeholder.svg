@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" role="img" aria-label="Package TBNK-SMP">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#242424"/>
+      <stop offset="1" stop-color="#141414"/>
+    </linearGradient>
+    <linearGradient id="orange" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#FFB347"/>
+      <stop offset="1" stop-color="#E86E1D"/>
+    </linearGradient>
+  </defs>
+  <rect width="400" height="300" rx="24" fill="url(#bg)"/>
+  <path d="M0 240L400 120V300H0Z" fill="#F7941D" opacity="0.05"/>
+  <g stroke="#F7941D" stroke-width="2" opacity="0.18">
+    <path d="M0 60h400M0 120h400M0 180h400M0 240h400"/>
+    <path d="M80 0v300M160 0v300M240 0v300M320 0v300"/>
+  </g>
+  <g transform="translate(200 150)">
+    <rect x="-58" y="-42" width="116" height="84" rx="10" fill="#1C1C1C" stroke="#F7941D" stroke-width="4"/>
+    <rect x="-46" y="-30" width="92" height="60" rx="4" fill="#111"/>
+    <path d="M-24 -12h48v8h-20v28h-8V-4h-20Z" fill="url(#orange)"/>
+    <path d="M-58 -42h116" stroke="#FFB347" stroke-width="3" opacity="0.7"/>
+  </g>
+  <text x="200" y="260" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="700" letter-spacing="4" fill="#9A9A9A">TBNK-SMP</text>
+</svg>

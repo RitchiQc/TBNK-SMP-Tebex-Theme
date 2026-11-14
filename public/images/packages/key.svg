@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" role="img" aria-label="Clé TBNK-SMP">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#1E2430"/>
+      <stop offset="0.6" stop-color="#15181E"/>
+      <stop offset="1" stop-color="#101010"/>
+    </linearGradient>
+    <linearGradient id="key" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#FFD37A"/>
+      <stop offset="0.5" stop-color="#F7941D"/>
+      <stop offset="1" stop-color="#B85C00"/>
+    </linearGradient>
+    <filter id="glow" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="12" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <rect width="400" height="300" rx="24" fill="url(#bg)"/>
+  <circle cx="200" cy="148" r="90" fill="#F7941D" opacity="0.07"/>
+  <g filter="url(#glow)" fill="url(#key)" transform="rotate(-38 200 148)">
+    <rect x="186" y="72" width="28" height="116" rx="8"/>
+    <rect x="186" y="168" width="58" height="22" rx="6"/>
+    <rect x="218" y="188" width="22" height="26" rx="5"/>
+    <circle cx="200" cy="78" r="30" fill="none" stroke="url(#key)" stroke-width="16"/>
+    <circle cx="200" cy="78" r="10" fill="#15181E"/>
+  </g>
+  <g fill="#FFE6B8" opacity="0.9">
+    <rect x="286" y="78" width="8" height="8"/>
+    <rect x="300" y="96" width="5" height="5"/>
+    <rect x="108" y="206" width="7" height="7"/>
+  </g>
+  <text x="200" y="262" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" font-weight="700" letter-spacing="5" fill="#C7A46A">CRATE KEY</text>
+</svg>

@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" role="img" aria-label="Rang TBNK-SMP">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#2A1C0B"/>
+      <stop offset="0.55" stop-color="#1B140C"/>
+      <stop offset="1" stop-color="#111"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FFD37A"/>
+      <stop offset="0.5" stop-color="#F7941D"/>
+      <stop offset="1" stop-color="#C96A00"/>
+    </linearGradient>
+    <filter id="glow" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="14" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <rect width="400" height="300" rx="24" fill="url(#bg)"/>
+  <circle cx="200" cy="140" r="92" fill="#F7941D" opacity="0.08"/>
+  <circle cx="200" cy="140" r="74" fill="none" stroke="#F7941D" stroke-width="2" opacity="0.25"/>
+  <g filter="url(#glow)" fill="url(#gold)">
+    <path d="M126 178l-12-64 40 24 46-50 46 50 40-24-12 64Z"/>
+    <rect x="126" y="182" width="148" height="20" rx="4"/>
+    <rect x="156" y="206" width="88" height="12" rx="3"/>
+  </g>
+  <g fill="#FFE6B8">
+    <rect x="164" y="146" width="10" height="10"/>
+    <rect x="195" y="134" width="10" height="10"/>
+    <rect x="226" y="146" width="10" height="10"/>
+  </g>
+  <text x="200" y="262" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" font-weight="700" letter-spacing="5" fill="#D9A45B">RANG OFFICIEL</text>
+</svg>

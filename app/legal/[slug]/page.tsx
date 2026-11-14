@@ -1,0 +1,112 @@
+import type { Metadata } from "next";
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import { Icon } from "@/components/ui/icons";
+import { siteConfig } from "@/lib/site";
+import {
+  LEGAL_LINKS,
+  getLegalPage
+} from "@/lib/legal";
+
+type PageProps = {
+  params: Promise<{ slug: string }>;
+};
+
+export function generateStaticParams() {
+  return LEGAL_LINKS.map((link) => ({ slug: link.slug }));
+}
+
+export async function generateMetadata({
+  params
+}: PageProps): Promise<Metadata> {
+  const { slug } = await params;
+  const page = getLegalPage(slug);
+
+  if (!page) {
+    return { title: "Page introuvable" };
+  }
+
+  return {
+    title: page.title,
+    description: page.description,
+    alternates: { canonical: `/legal/${page.slug}` }
+  };
+}
+
+export default async function LegalPage({ params }: PageProps) {
+  const { slug } = await params;
+  const page = getLegalPage(slug);
+
+  if (!page) {
+    notFound();
+  }
+
+  return (
+    <>
+      <section className="page-hero">
+        <div className="container-tbnk page-hero__inner">
+          <nav className="breadcrumb" aria-label="Fil d’Ariane">
+            <Link href="/">Accueil</Link>
+            <span>/</span>
+            <b>{page.title}</b>
+          </nav>
+          <span className="eyebrow" style={{ marginTop: 18 }}>
+            Informations légales
+          </span>
+          <h1>{page.title}</h1>
+          <p>{page.description}</p>
+          <p className="legal-updated">Dernière mise à jour : {page.updated}</p>
+        </div>
+      </section>
+
+      <div className="container-tbnk" style={{ paddingBottom: 34 }}>
+        <div className="legal-layout">
+          <nav className="legal-nav" aria-label="Pages légales">
+            {LEGAL_LINKS.map((link) => (
+              <Link
+                key={link.slug}
+                href={`/legal/${link.slug}`}
+                className={link.slug === page.slug ? "is-active" : undefined}
+              >
+                {link.label}
+              </Link>
+            ))}
+          </nav>
+
+          <div>
+            <article
+              className="legal-content"
+              dangerouslySetInnerHTML={{ __html: page.html }}
+            />
+
+            <div className="cta-band" style={{ marginTop: 18 }}>
+              <div className="cta-band__content">
+                <span className="eyebrow">Une question ?</span>
+                <h2>Le support est sur Discord</h2>
+                <p>
+                  Pour une question sur un achat, une livraison ou tes données,
+                  ouvre un ticket sur le Discord officiel de {siteConfig.name}.
+                </p>
+              </div>
+              <div className="cta-band__actions">
+                <a
+                  href={siteConfig.discordUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn btn-primary"
+                >
+                  <Icon name="discord" size={17} />
+                  Rejoindre le Discord
+                </a>
+                <Link href="/store" className="btn btn-secondary">
+                  <Icon name="store" size={17} />
+                  Boutique
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </>
+  );
+}

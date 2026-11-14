@@ -1,0 +1,66 @@
+"use server";
+
+import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
+import { siteConfig } from "@/lib/site";
+import {
+  getBasketAuthProvidersRaw,
+  isMockMode
+} from "@/lib/tebex/client";
+import { mapAuthProviders } from "@/lib/tebex/mapper";
+import type { CheckoutResult } from "./action-types";
+import { clearMockBasketCookie } from "./cookies";
+import { getCurrentBasket } from "./session";
+
+export async function prepareCheckoutAction(): Promise<CheckoutResult> {
+  if (isMockMode) {
+    return { mode: "demo" };
+  }
+
+  try {
+    const basket = await getCurrentBasket();
+
+    if (!basket || basket.packages.length === 0) {
+      return { mode: "error", error: "Ton panier est vide." };
+    }
+
+    if (basket.checkoutUrl) {
+      return {
+        mode: "checkout",
+        ident: basket.ident,
+        url: basket.checkoutUrl
+      };
+    }
+
+    const providers = mapAuthProviders(
+      await getBasketAuthProvidersRaw(
+        basket.ident,
+        `${siteConfig.url}/cart`
+      )
+    );
+
+    if (providers.length > 0) {
+      return { mode: "auth", url: providers[0].url };
+    }
+
+    return {
+      mode: "error",
+      error:
+        "Impossible de préparer le paiement. Réessaie ou contacte-nous sur Discord."
+    };
+  } catch (error) {
+    console.error("[checkout] preparation failed", error);
+    return {
+      mode: "error",
+      error:
+        "Impossible de préparer le paiement pour le moment. Réessaie dans un instant."
+    };
+  }
+}
+
+export async function clearDemoBasketAction(): Promise<void> {
+  await clearMockBasketCookie();
+  revalidatePath("/cart");
+  revalidatePath("/", "layout");
+  redirect("/cart");
+}
