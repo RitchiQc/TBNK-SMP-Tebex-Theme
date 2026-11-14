@@ -81,7 +81,10 @@ export function parseMockBasketData(
       id,
       quantity
     })),
-    coupon: typeof record.coupon === "string" ? record.coupon : null
+    coupon:
+      typeof record.coupon === "string"
+        ? record.coupon.trim().slice(0, 64) || null
+        : null
   };
 }
 

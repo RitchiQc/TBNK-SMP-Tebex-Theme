@@ -1,15 +1,19 @@
 import type { LegalPage } from "./types";
+import { contactBlock, emailLink, legalIdentity } from "./helpers";
 
 export const contact: LegalPage = {
   slug: "contact",
   title: "Contact & support",
   description:
-    "Contacter le support de la boutique et du serveur TBNK-SMP.",
-  updated: "13 novembre 2026",
+    "Contacter le support, le responsable de la confidentialité et le service à la clientèle de TBNK-SMP.",
+  updated: "14 novembre 2026",
   html: `
+    <h2>Coordonnées du commerçant</h2>
+    ${contactBlock()}
+
     <h2>Support TBNK-SMP</h2>
-    <p>Le support officiel se fait sur Discord. C’est le moyen le plus rapide pour obtenir de l’aide sur un achat, une livraison ou un problème en jeu.</p>
-    <p><a href="https://discord.gg/td98WkM7V5" target="_blank" rel="noopener noreferrer">Rejoindre le Discord TBNK-SMP</a></p>
+    <p>Le support officiel se fait par courriel et sur Discord. C’est le moyen le plus rapide pour obtenir de l’aide sur un achat, une livraison ou un problème en jeu.</p>
+    <p>${emailLink(legalIdentity.supportEmail)} — <a href="https://discord.gg/td98WkM7V5" target="_blank" rel="noopener noreferrer">Rejoindre le Discord TBNK-SMP</a></p>
 
     <h2>Problème de livraison</h2>
     <p>Avant d’ouvrir un ticket, vérifie que :</p>
@@ -19,14 +23,18 @@ export const contact: LegalPage = {
       <li>le paiement a bien été confirmé par Tebex ;</li>
       <li>tu as attendu quelques minutes après la transaction.</li>
     </ul>
-    <p>Dans ton ticket, indique ton pseudo, la date de l’achat, le nom de l’article et l’identifiant de transaction Tebex.</p>
+    <p>Dans ton message, indique ton pseudo, la date de l’achat, le nom de l’article et l’identifiant de transaction Tebex.</p>
 
     <h2>Problème de paiement</h2>
-    <p>Les paiements sont traités par Tebex. Pour une question de facturation, de moyen de paiement ou de remboursement, contacte le support Tebex en plus du Discord TBNK-SMP.</p>
+    <p>Les paiements sont traités par Tebex. Pour une question de facturation, de moyen de paiement ou de remboursement, contacte le support Tebex en plus du support TBNK-SMP.</p>
     <p><a href="https://www.tebex.io" target="_blank" rel="noopener noreferrer">Site officiel Tebex</a></p>
 
-    <h2>Demandes légales</h2>
-    <p>Pour une demande liée à la confidentialité ou à tes données, utilise le Discord et précise clairement « demande de confidentialité ». Nous te répondrons dans les meilleurs délais.</p>
+    <h2>Confidentialité et droits (Loi 25)</h2>
+    <p>Pour une demande d’accès, de rectification, de suppression, de portabilité, de retrait de consentement ou toute question relative à tes renseignements personnels, écris à ${emailLink(legalIdentity.privacyEmail)} en précisant ton pseudo Minecraft et l’objet « demande de confidentialité ».</p>
+    <p>Tu peux aussi porter plainte auprès de la <a href="https://www.cai.gouv.qc.ca" target="_blank" rel="noopener noreferrer">Commission d’accès à l’information du Québec</a>.</p>
+
+    <h2>Droit de la consommation</h2>
+    <p>Pour une réclamation liée à un achat, tu peux communiquer avec l’<a href="https://www.opc.gouv.qc.ca" target="_blank" rel="noopener noreferrer">Office de la protection du consommateur du Québec</a>. Nos conditions et notre politique de remboursement ne limitent pas les droits impératifs prévus par la LPC.</p>
 
     <h2>Informations utiles</h2>
     <ul>
@@ -34,6 +42,7 @@ export const contact: LegalPage = {
       <li>Édition : Minecraft Java uniquement</li>
       <li>IP : play.tbnk-smp.com</li>
       <li>Discord : discord.gg/td98WkM7V5</li>
+      <li>Langue du service : français</li>
     </ul>
   `
 };

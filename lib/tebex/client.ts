@@ -1,18 +1,21 @@
 import "server-only";
 
+import { isMockMode, tebexPublicToken } from "@/lib/env";
 import { siteConfig } from "@/lib/site";
+import { isValidBasketIdent } from "./ids";
 
 const API_BASE =
   process.env.TEBEX_API_BASE?.replace(/\/$/, "") ??
   "https://headless.tebex.io/api";
 
-const PUBLIC_TOKEN = process.env.TEBEX_PUBLIC_TOKEN?.trim() ?? "";
+const PUBLIC_TOKEN = tebexPublicToken;
 
 /**
- * Mode démo : aucun token public Tebex n'est configuré.
- * Le catalogue et le panier utilisent alors les données de `data/mock.ts`.
+ * Mode démo : aucun token public Tebex n'est configuré en développement ou en
+ * préproduction. En production, `lib/env.ts` fait échouer le démarrage si le
+ * token manque.
  */
-export const isMockMode = PUBLIC_TOKEN.length === 0;
+export { isMockMode };
 
 export class TebexError extends Error {
   readonly status: number;
@@ -161,6 +164,8 @@ export async function createBasketRaw(
 export async function getBasketRaw(
   ident: string
 ): Promise<unknown | null> {
+  if (!isValidBasketIdent(ident)) return null;
+
   return request(accountUrl(`/baskets/${encodeURIComponent(ident)}`), {
     notFound: [404]
   });
@@ -170,6 +175,8 @@ export async function getBasketAuthProvidersRaw(
   ident: string,
   returnUrl: string
 ): Promise<unknown | null> {
+  if (!isValidBasketIdent(ident)) return null;
+
   return request(
     accountUrl(
       `/baskets/${encodeURIComponent(ident)}/auth?returnUrl=${encodeURIComponent(

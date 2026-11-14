@@ -1,6 +1,7 @@
 import { chromium } from "playwright-core";
 
 const BASE_URL = process.env.BASE_URL ?? "http://localhost:3000";
+const BASE_HOST = new URL(BASE_URL).hostname;
 const executablePath =
   process.env.BROWSER_PATH ??
   process.env.EDGE_PATH ??
@@ -16,6 +17,21 @@ const context = await browser.newContext({
   viewport: { width: 1440, height: 1000 },
   locale: "fr-CA"
 });
+await context.addCookies([
+  {
+    name: "tbnk_consent",
+    value: encodeURIComponent(
+      JSON.stringify({
+        necessary: true,
+        media: false,
+        avatars: false,
+        version: 1
+      })
+    ),
+    domain: BASE_HOST,
+    path: "/"
+  }
+]);
 const page = await context.newPage();
 const errors = [];
 page.on("console", (message) => {

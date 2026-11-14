@@ -1,6 +1,11 @@
 "use client";
 
 import { useState } from "react";
+import {
+  CONSENT_VERSION,
+  saveConsent,
+  useConsent
+} from "@/lib/consent-client";
 import type { PackageMedia } from "@/lib/tebex/types";
 import { Icon } from "@/components/ui/icons";
 
@@ -40,24 +45,59 @@ export function PackageGallery({
           }
         ];
   const [activeIndex, setActiveIndex] = useState(0);
+  const consent = useConsent();
   const current = items[Math.min(activeIndex, items.length - 1)];
+  const embed = current.type === "video" ? youtubeEmbed(current.url) : null;
+
+  function allowMedia(): void {
+    saveConsent({
+      media: true,
+      avatars: consent.avatars,
+      version: CONSENT_VERSION
+    });
+  }
 
   return (
     <div className="gallery">
       <div className="gallery__main">
         {current.type === "video" ? (
-          youtubeEmbed(current.url) ? (
+          !consent.media ? (
+            <div className="gallery__consent">
+              <p>
+                Cette vidéo est hébergée par YouTube. En la lisant, tu acceptes
+                le chargement de YouTube et de ses témoins.
+              </p>
+              <button
+                type="button"
+                className="btn btn-primary btn-sm"
+                onClick={allowMedia}
+              >
+                <Icon name="play" size={15} />
+                Lire la vidéo
+              </button>
+            </div>
+          ) : embed ? (
             <iframe
-              src={youtubeEmbed(current.url) ?? ""}
+              src={embed.replace(
+                "https://www.youtube.com/",
+                "https://www.youtube-nocookie.com/"
+              )}
               title={current.name ?? name}
+              loading="lazy"
+              referrerPolicy="strict-origin-when-cross-origin"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
               allowFullScreen
             />
           ) : (
-            <video src={current.url} controls playsInline />
+            <video src={current.url} controls playsInline preload="metadata" />
           )
         ) : (
-          <img src={current.url || fallback} alt={name} />
+          <img
+            src={current.url || fallback}
+            alt={name}
+            decoding="async"
+            loading="eager"
+          />
         )}
       </div>
 
@@ -72,7 +112,7 @@ export function PackageGallery({
               aria-label={`Voir le média ${index + 1}`}
             >
               {item.type === "image" ? (
-                <img src={item.url} alt="" />
+                <img src={item.url} alt="" loading="lazy" decoding="async" />
               ) : (
                 <span
                   style={{

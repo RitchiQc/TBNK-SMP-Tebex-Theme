@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { StoreCatalog } from "@/components/store/store-catalog";
+import { StoreUnavailable } from "@/components/store/store-unavailable";
 import { Icon } from "@/components/ui/icons";
 import { getCurrentBasketSafe } from "@/lib/basket/session";
 import { siteConfig } from "@/lib/site";
@@ -59,28 +60,13 @@ export default async function StorePage() {
         </div>
       </section>
 
-      {unavailable ? (
-        <section className="container-tbnk section">
-          <div className="empty-state">
-            <span className="empty-state__icon">
-              <Icon name="package" size={24} />
-            </span>
-            <h2>Boutique temporairement indisponible</h2>
-            <p>
-              Le catalogue Tebex ne répond pas pour le moment. Réessaie dans un
-              instant ou rejoins le Discord pour être informé.
-            </p>
-            <a
-              href={siteConfig.discordUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn btn-primary btn-sm"
-            >
-              <Icon name="discord" size={15} />
-              Rejoindre le Discord
-            </a>
-          </div>
-        </section>
+      {webstore.disabled ? (
+        <StoreUnavailable
+          title="Boutique temporairement fermée"
+          message="La boutique est momentanément fermée. Reviens bientôt ou rejoins le Discord pour être informé de la réouverture."
+        />
+      ) : unavailable ? (
+        <StoreUnavailable />
       ) : categories.length === 0 ? (
         <section className="container-tbnk section">
           <div className="empty-state">

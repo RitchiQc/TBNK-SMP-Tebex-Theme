@@ -2,6 +2,7 @@ import Link from "next/link";
 import { getDiscordStats } from "@/lib/community/discord";
 import { siteConfig } from "@/lib/site";
 import { getStoreDataSafe } from "@/lib/tebex/store";
+import { CookieSettingsButton } from "@/components/consent/cookie-settings-button";
 import { CopyButton } from "@/components/ui/copy-button";
 import { Icon } from "@/components/ui/icons";
 
@@ -48,6 +49,36 @@ export async function SiteFooter() {
                 className="btn btn-secondary btn-sm"
               />
             </div>
+
+            <div className="footer-legal-identity">
+              <strong>{siteConfig.legalName || "Identité légale à compléter"}</strong>
+              <span>{siteConfig.legalAddress || "Adresse à compléter"}</span>
+              <span>
+                {siteConfig.legalPhone || "Téléphone à compléter"}
+                {" · "}
+                {siteConfig.supportEmail ? (
+                  <a href={`mailto:${siteConfig.supportEmail}`}>
+                    {siteConfig.supportEmail}
+                  </a>
+                ) : (
+                  "Courriel à compléter"
+                )}
+              </span>
+              <span>
+                Confidentialité :{" "}
+                {siteConfig.privacyEmail || siteConfig.supportEmail ? (
+                  <a
+                    href={`mailto:${
+                      siteConfig.privacyEmail || siteConfig.supportEmail
+                    }`}
+                  >
+                    {siteConfig.privacyEmail || siteConfig.supportEmail}
+                  </a>
+                ) : (
+                  "Courriel à compléter"
+                )}
+              </span>
+            </div>
           </div>
 
           <div>
@@ -89,11 +120,10 @@ export async function SiteFooter() {
               <Link href="/legal/refund">Politique de remboursement</Link>
               <Link href="/legal/contact">Contact</Link>
             </div>
-            <div className="payment-pills" aria-label="Moyens de paiement">
-              <span className="payment-pill">Visa</span>
-              <span className="payment-pill">Mastercard</span>
-              <span className="payment-pill">PayPal</span>
-              <span className="payment-pill">Interac</span>
+            <div className="payment-pills" aria-label="Paiement">
+              <span className="payment-pill">Tebex</span>
+              <span className="payment-pill">Paiement sécurisé</span>
+              <span className="payment-pill">Moyens affichés au checkout</span>
             </div>
           </div>
         </div>
@@ -116,6 +146,7 @@ export async function SiteFooter() {
             <Link href="/legal/terms">Conditions</Link>
             <Link href="/legal/privacy">Confidentialité</Link>
             <Link href="/legal/refund">Remboursement</Link>
+            <CookieSettingsButton />
             <a
               href="https://www.tebex.io"
               target="_blank"

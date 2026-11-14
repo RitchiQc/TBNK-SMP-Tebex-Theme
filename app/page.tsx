@@ -30,11 +30,12 @@ export default async function HomePage({
     <>
       {params.checkout === "success" ? (
         <div className="container-tbnk" style={{ paddingTop: 20 }}>
-          <div className="cart-login-banner">
+          <div className="cart-login-banner" role="status">
             <p>
-              <b>Merci pour ton achat !</b> Ta commande a bien été transmise à
-              Tebex. La livraison en jeu est automatique pour les articles
-              éligibles.
+              <b>Retour de Tebex.</b> Si ton paiement a été confirmé, ta
+              commande a été transmise à Tebex et la livraison en jeu est
+              automatique pour les articles éligibles. Consulte ton reçu Tebex
+              pour la confirmation officielle.
             </p>
             <a
               href={siteConfig.discordUrl}
@@ -51,7 +52,7 @@ export default async function HomePage({
 
       {unavailable ? (
         <div className="container-tbnk" style={{ paddingTop: 20 }}>
-          <div className="cart-login-banner">
+          <div className="cart-login-banner" role="status">
             <p>
               <b>Boutique temporairement indisponible.</b> Le catalogue Tebex ne
               répond pas pour le moment. Le serveur, le guide et les pages

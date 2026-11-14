@@ -1,8 +1,11 @@
 import type { Metadata, Viewport } from "next";
 import { Montserrat, Pixelify_Sans } from "next/font/google";
+import { CookieConsent } from "@/components/consent/cookie-consent";
+import { DemoBanner } from "@/components/layout/demo-banner";
 import { SiteFooter } from "@/components/layout/footer";
 import { SiteHeader } from "@/components/layout/header";
 import { ToastProvider } from "@/components/ui/toast";
+import { isProduction } from "@/lib/deployment";
 import { siteConfig } from "@/lib/site";
 import "./globals.css";
 
@@ -58,8 +61,8 @@ export const metadata: Metadata = {
     shortcut: [siteConfig.favicon]
   },
   robots: {
-    index: true,
-    follow: true
+    index: isProduction,
+    follow: isProduction
   },
   formatDetection: {
     telephone: false
@@ -84,12 +87,14 @@ export default function RootLayout({
         </a>
         <ToastProvider>
           <div className="site-shell">
+            <DemoBanner />
             <SiteHeader />
             <main id="main" className="site-content">
               {children}
             </main>
             <SiteFooter />
           </div>
+          <CookieConsent />
         </ToastProvider>
       </body>
     </html>

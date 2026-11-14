@@ -20,16 +20,14 @@ function normalizeSiteUrl(value: string | undefined): string {
 
 const rawSiteUrl = normalizeSiteUrl(process.env.NEXT_PUBLIC_SITE_URL);
 
-if (
-  typeof window === "undefined" &&
-  process.env.NODE_ENV === "production" &&
-  process.env.NEXT_PHASE !== "phase-production-build" &&
-  rawSiteUrl.includes("localhost")
-) {
-  console.error(
-    "[site] NEXT_PUBLIC_SITE_URL doit être configurée avec le domaine public en production."
-  );
-}
+const legalName = process.env.NEXT_PUBLIC_LEGAL_NAME?.trim() ?? "";
+const legalAddress = process.env.NEXT_PUBLIC_LEGAL_ADDRESS?.trim() ?? "";
+const legalPhone = process.env.NEXT_PUBLIC_LEGAL_PHONE?.trim() ?? "";
+const supportEmail = process.env.NEXT_PUBLIC_SUPPORT_EMAIL?.trim() ?? "";
+const privacyEmail = process.env.NEXT_PUBLIC_PRIVACY_EMAIL?.trim() ?? "";
+const privacyOfficer = process.env.NEXT_PUBLIC_PRIVACY_OFFICER?.trim() ?? "";
+const pricesIncludeTaxes =
+  process.env.NEXT_PUBLIC_PRICES_INCLUDE_TAXES === "true";
 
 export const siteConfig = {
   name: "TBNK-SMP",
@@ -49,7 +47,17 @@ export const siteConfig = {
   discordGuildId: "1566593760870277241",
   discordFallbackMembers: 94,
   discordFallbackOnline: 35,
-  supportEmail: "",
+  legalName,
+  legalAddress,
+  legalPhone,
+  supportEmail,
+  privacyEmail,
+  privacyOfficer,
+  governingLaw: "Québec (Canada)",
+  pricesIncludeTaxes,
+  taxNote: pricesIncludeTaxes
+    ? "Taxes incluses."
+    : "Taxes calculées au paiement.",
   logo: "/images/logo.png",
   banner: "/images/banner.png",
   favicon: "/icon.svg",

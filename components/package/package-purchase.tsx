@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { addToBasketAction } from "@/lib/basket/actions";
 import { formatCurrency } from "@/lib/format";
+import { siteConfig } from "@/lib/site";
 import type { Package } from "@/lib/tebex/types";
 import { Icon } from "@/components/ui/icons";
 import { useToast } from "@/components/ui/toast";
@@ -89,8 +90,20 @@ export function PackagePurchase({
                 ? "Gratuit"
                 : formatCurrency(pkg.totalPrice, currency)}
             </strong>
-            {isSubscription ? <span>/ période</span> : null}
+            {isSubscription ? (
+              <span>
+                {pkg.billingPeriod ? ` / ${pkg.billingPeriod}` : " / période"}
+              </span>
+            ) : null}
           </div>
+          <p className="price__tax">{siteConfig.taxNote}</p>
+          {isSubscription ? (
+            <p className="form-note">
+              Abonnement récurrent : la fréquence, le montant récurrent et les
+              modalités d’annulation sont confirmés sur la page de paiement
+              Tebex.
+            </p>
+          ) : null}
         </div>
         {pkg.discountPercent > 0 ? (
           <span className="badge badge-danger">-{pkg.discountPercent}%</span>

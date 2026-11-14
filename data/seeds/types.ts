@@ -9,6 +9,7 @@ export type PackageSeed = {
   type: PackageType;
   basePrice: number;
   totalPrice?: number;
+  billingPeriod?: string;
   disableQuantity?: boolean;
   featured?: boolean;
   order?: number;

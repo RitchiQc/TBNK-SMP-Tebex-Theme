@@ -46,8 +46,10 @@ import { ensureBasket, getCurrentBasket } from "./session";
 
 const MAX_VARIABLE_LENGTH = 128;
 const MAX_VARIABLE_COUNT = 50;
-const MAX_VARIABLE_PAYLOAD = 3000;
+const MAX_VARIABLE_PAYLOAD = 2000;
 const MAX_COUPON_LENGTH = 64;
+const MAX_PACKAGE_REFERENCE_LENGTH = 64;
+const MAX_RETURN_PATH_LENGTH = 512;
 
 function clampQuantity(value: number): number {
   if (!Number.isFinite(value)) return 1;
@@ -199,7 +201,7 @@ async function resolveAddInput(
   { ok: true; value: ResolvedAdd } | { ok: false; error: string }
 > {
   const reference = String(input.packageId ?? "").trim();
-  if (!reference) {
+  if (!reference || reference.length > MAX_PACKAGE_REFERENCE_LENGTH) {
     return { ok: false, error: "Package invalide." };
   }
 
@@ -231,7 +233,10 @@ async function resolveAddInput(
       pkg,
       quantity,
       variableData: input.variableData,
-      returnPath: safeRedirectPath(input.returnPath)
+      returnPath: safeRedirectPath(input.returnPath).slice(
+        0,
+        MAX_RETURN_PATH_LENGTH
+      )
     }
   };
 }
@@ -239,6 +244,10 @@ async function resolveAddInput(
 export async function addToBasketAction(
   input: AddToBasketInput
 ): Promise<BasketActionResult> {
+  if (!input || typeof input !== "object" || Array.isArray(input)) {
+    return { success: false, error: "Requête invalide." };
+  }
+
   if (!(await rateLimit("basket:add", 30, 60_000))) {
     return {
       success: false,
@@ -272,6 +281,13 @@ export async function addToBasketAction(
 
   try {
     const webstore = await getWebstore();
+    if (webstore.disabled) {
+      return {
+        success: false,
+        error: "La boutique est temporairement fermée."
+      };
+    }
+
     const username = await getUsernameCookie();
 
     if (webstore.supportsUsernames && !username) {
@@ -561,6 +577,13 @@ export async function loginAction(
   _previousState: LoginState,
   formData: FormData
 ): Promise<LoginState> {
+  if (
+    !formData ||
+    typeof (formData as { get?: unknown }).get !== "function"
+  ) {
+    return { error: "Requête invalide." };
+  }
+
   if (!(await rateLimit("auth:login", 20, 60_000))) {
     return { error: "Trop de tentatives. Réessaie dans une minute." };
   }

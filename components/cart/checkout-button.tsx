@@ -6,17 +6,10 @@ import {
   prepareCheckoutAction
 } from "@/lib/basket/checkout-actions";
 import { siteConfig } from "@/lib/site";
+import { loadTebexScript } from "@/lib/tebex/script";
+import { isAllowedTebexUrl } from "@/lib/tebex/urls";
 import { Icon } from "@/components/ui/icons";
 import { useToast } from "@/components/ui/toast";
-
-function isSafeCheckoutUrl(value: string | null): value is string {
-  if (!value) return false;
-  try {
-    return new URL(value).protocol === "https:";
-  } catch {
-    return false;
-  }
-}
 
 export function CheckoutButton({
   disabled,
@@ -40,57 +33,66 @@ export function CheckoutButton({
 
   function checkout() {
     startTransition(async () => {
-      const result = await prepareCheckoutAction();
+      try {
+        const result = await prepareCheckoutAction();
 
-      if (result.mode === "demo") {
-        setDemoOpen(true);
-        return;
-      }
-
-      if (result.mode === "auth") {
-        if (!isSafeCheckoutUrl(result.url)) {
-          toast("Lien d'authentification Tebex invalide.", {
-            variant: "error"
-          });
+        if (result.mode === "demo") {
+          setDemoOpen(true);
           return;
         }
-        window.location.href = result.url;
-        return;
-      }
 
-      if (result.mode === "checkout") {
-        if (window.Tebex?.checkout) {
-          try {
-            window.Tebex.checkout.init({
-              ident: result.ident,
-              theme: "dark",
-              colors: [{ name: "primary", color: siteConfig.accent }]
+        if (result.mode === "auth") {
+          if (!isAllowedTebexUrl(result.url)) {
+            toast("Lien d'authentification Tebex invalide.", {
+              variant: "error"
             });
-            window.Tebex.checkout.launch();
             return;
-          } catch {
-            // Fallback vers l'URL de checkout hébergée ci-dessous.
           }
-        }
-
-        if (isSafeCheckoutUrl(result.url)) {
           window.location.href = result.url;
           return;
         }
 
-        toast("Lien de paiement Tebex invalide.", { variant: "error" });
-        return;
-      }
+        if (result.mode === "checkout") {
+          const scriptLoaded = await loadTebexScript();
 
-      if (result.mode === "error") {
-        toast(result.error, { variant: "error" });
-        return;
-      }
+          if (scriptLoaded && window.Tebex?.checkout) {
+            try {
+              window.Tebex.checkout.init({
+                ident: result.ident,
+                theme: "dark",
+                colors: [{ name: "primary", color: siteConfig.accent }]
+              });
+              window.Tebex.checkout.launch();
+              return;
+            } catch {
+              // Fallback vers l'URL de checkout hébergée ci-dessous.
+            }
+          }
 
-      toast(
-        "Impossible de préparer le paiement. Réessaie ou contacte-nous sur Discord.",
-        { variant: "error" }
-      );
+          if (isAllowedTebexUrl(result.url)) {
+            window.location.href = result.url;
+            return;
+          }
+
+          toast("Lien de paiement Tebex invalide.", { variant: "error" });
+          return;
+        }
+
+        if (result.mode === "error") {
+          toast(result.error, { variant: "error" });
+          return;
+        }
+
+        toast(
+          "Impossible de préparer le paiement. Réessaie ou contacte-nous sur Discord.",
+          { variant: "error" }
+        );
+      } catch {
+        toast(
+          "Impossible de préparer le paiement pour le moment. Réessaie dans un instant.",
+          { variant: "error" }
+        );
+      }
     });
   }
 

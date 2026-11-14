@@ -1,16 +1,17 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import Script from "next/script";
 import { CartLine } from "@/components/cart/cart-line";
 import { CheckoutButton } from "@/components/cart/checkout-button";
 import { CouponForm } from "@/components/cart/coupon-form";
 import { Icon } from "@/components/ui/icons";
+import { getBasketIdentCookie } from "@/lib/basket/cookies";
 import {
-  getCurrentBasket,
+  getCurrentBasketSafe,
   getEffectiveUsername
 } from "@/lib/basket/session";
 import { formatCurrency } from "@/lib/format";
 import { siteConfig } from "@/lib/site";
+import { getStoreDataSafe } from "@/lib/tebex/store";
 
 export const metadata: Metadata = {
   title: "Panier",
@@ -19,13 +20,17 @@ export const metadata: Metadata = {
 };
 
 export default async function CartPage() {
-  const [basket, username] = await Promise.all([
-    getCurrentBasket(),
-    getEffectiveUsername()
+  const [basket, username, store, basketIdent] = await Promise.all([
+    getCurrentBasketSafe(),
+    getEffectiveUsername(),
+    getStoreDataSafe(),
+    getBasketIdentCookie()
   ]);
 
   const currency = basket?.currency || siteConfig.currency;
   const isEmpty = !basket || basket.packages.length === 0;
+  const cartUnavailable = Boolean(basketIdent) && !basket;
+  const unavailable = store.unavailable || cartUnavailable;
 
   return (
     <>
@@ -63,15 +68,30 @@ export default async function CartPage() {
       </section>
 
       <div className="container-tbnk" style={{ paddingBottom: 30 }}>
+        {unavailable ? (
+          <div className="cart-login-banner" style={{ marginBottom: 16 }}>
+            <p>
+              <b>Panier temporairement indisponible.</b> Tebex ne répond pas
+              pour le moment. Ton panier n’est pas perdu : recharge la page dans
+              un instant.
+            </p>
+          </div>
+        ) : null}
+
         {isEmpty ? (
           <div className="empty-state">
             <span className="empty-state__icon">
               <Icon name="cart" size={26} />
             </span>
-            <h2>Ton panier est vide</h2>
+            <h2>
+              {unavailable
+                ? "Impossible de charger ton panier"
+                : "Ton panier est vide"}
+            </h2>
             <p>
-              Parcours la boutique et ajoute un rang, une clé ou un cosmétique
-              pour commencer.
+              {unavailable
+                ? "Réessaie dans quelques instants. Si le problème persiste, contacte le support Discord."
+                : "Parcours la boutique et ajoute un rang, une clé ou un cosmétique pour commencer."}
             </p>
             <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
               <Link href="/store" className="btn btn-primary btn-sm">
@@ -153,6 +173,11 @@ export default async function CartPage() {
                   <strong>{formatCurrency(basket.totalPrice, currency)}</strong>
                 </div>
 
+                <p className="form-note" style={{ marginBottom: 12 }}>
+                  {siteConfig.taxNote} Le montant final et les taxes applicables
+                  sont confirmés sur la page de paiement Tebex.
+                </p>
+
                 <CheckoutButton
                   disabled={basket.packages.length === 0}
                   isMock={basket.isMock}
@@ -179,13 +204,6 @@ export default async function CartPage() {
           </>
         )}
       </div>
-
-      {!isEmpty ? (
-        <Script
-          src="https://js.tebex.io/v/1.js"
-          strategy="afterInteractive"
-        />
-      ) : null}
     </>
   );
 }

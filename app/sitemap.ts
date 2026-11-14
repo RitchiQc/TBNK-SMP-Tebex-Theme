@@ -1,9 +1,12 @@
 import type { MetadataRoute } from "next";
+import { isProduction } from "@/lib/deployment";
 import { LEGAL_LINKS } from "@/lib/legal";
 import { siteConfig } from "@/lib/site";
 import { getStoreData } from "@/lib/tebex/store";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  if (!isProduction) return [];
+
   const now = new Date();
   const staticRoutes: MetadataRoute.Sitemap = [
     {

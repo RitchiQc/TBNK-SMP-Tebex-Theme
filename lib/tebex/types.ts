@@ -61,6 +61,8 @@ export interface Package {
   totalPrice: number;
   currency: string;
   expirationDate: string | null;
+  /** Période de facturation d'un abonnement, si Tebex la fournit. */
+  billingPeriod: string | null;
   categoryId: number;
   categoryName: string;
   categorySlug: string;

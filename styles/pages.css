@@ -627,6 +627,7 @@
 .store-sort:focus {
   border-color: var(--accent);
   outline: none;
+  box-shadow: 0 0 0 2px rgba(247, 148, 29, 0.2);
 }
 
 .store-results {

@@ -646,7 +646,10 @@
 .qty-input:focus {
   border-color: var(--accent);
   outline: none;
-} .qty-stepper {
+  box-shadow: 0 0 0 2px rgba(247, 148, 29, 0.22);
+}
+
+.qty-stepper {
   display: inline-flex;
   align-items: center;
   overflow: hidden;
@@ -684,8 +687,9 @@
   text-align: center;
 }
 
-.qty-stepper input:focus {
-  outline: none;
+.qty-stepper input:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
 }
 
 .price--lg .price__current {

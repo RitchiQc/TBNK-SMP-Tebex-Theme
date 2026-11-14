@@ -2,11 +2,15 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { StoreCatalog } from "@/components/store/store-catalog";
+import { StoreUnavailable } from "@/components/store/store-unavailable";
 import { Icon } from "@/components/ui/icons";
 import { getCurrentBasketSafe } from "@/lib/basket/session";
 import { stripHtml } from "@/lib/format";
 import { siteConfig } from "@/lib/site";
-import { getCategoryBySlug, getStoreData } from "@/lib/tebex/store";
+import {
+  getCategoryBySlugSafe,
+  getStoreDataSafe
+} from "@/lib/tebex/store";
 
 type PageProps = {
   params: Promise<{ slug: string }>;
@@ -16,7 +20,7 @@ export async function generateMetadata({
   params
 }: PageProps): Promise<Metadata> {
   const { slug } = await params;
-  const category = await getCategoryBySlug(slug);
+  const category = await getCategoryBySlugSafe(slug);
 
   if (!category) {
     notFound();
@@ -35,14 +39,27 @@ export async function generateMetadata({
 
 export default async function CategoryPage({ params }: PageProps) {
   const { slug } = await params;
-  const [category, { webstore, categories }, basket] = await Promise.all([
-    getCategoryBySlug(slug),
-    getStoreData(),
-    getCurrentBasketSafe()
-  ]);
+  const [category, { webstore, categories, unavailable }, basket] =
+    await Promise.all([
+      getCategoryBySlugSafe(slug),
+      getStoreDataSafe(),
+      getCurrentBasketSafe()
+    ]);
 
   if (!category) {
+    if (unavailable) {
+      return <StoreUnavailable />;
+    }
     notFound();
+  }
+
+  if (webstore.disabled) {
+    return (
+      <StoreUnavailable
+        title="Boutique temporairement fermée"
+        message="La boutique est momentanément fermée. Reviens bientôt ou rejoins le Discord pour être informé de la réouverture."
+      />
+    );
   }
 
   const basketQuantities: Record<number, number> = {};

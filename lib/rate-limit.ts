@@ -1,6 +1,7 @@
 import "server-only";
 
 import { headers } from "next/headers";
+import { trustProxy } from "@/lib/env";
 
 type Bucket = {
   count: number;
@@ -41,9 +42,17 @@ export async function rateLimit(
 
   try {
     const store = await headers();
-    const forwarded =
-      store.get("x-forwarded-for") ?? store.get("x-real-ip") ?? "unknown";
-    ip = forwarded.split(",")[0]?.trim() || "unknown";
+
+    if (trustProxy) {
+      const forwarded =
+        store.get("x-forwarded-for") ??
+        store.get("x-real-ip") ??
+        "unknown";
+      const first = forwarded.split(",")[0]?.trim() ?? "";
+      // On ne conserve que les caractères plausibles d'une IP afin d'éviter
+      // qu'un en-tête forgé ne crée des clés arbitrairement longues.
+      ip = first.replace(/[^0-9a-fA-F:.]/g, "").slice(0, 64) || "unknown";
+    }
   } catch {
     // Pas de contexte de requête : on laisse passer.
   }

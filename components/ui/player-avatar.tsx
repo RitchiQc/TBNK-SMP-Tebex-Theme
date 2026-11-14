@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useConsent } from "@/lib/consent-client";
 import { initials } from "@/lib/format";
 
 export function PlayerAvatar({
@@ -13,8 +14,9 @@ export function PlayerAvatar({
   className?: string;
 }) {
   const [failed, setFailed] = useState(false);
+  const consent = useConsent();
 
-  if (!username || failed) {
+  if (!username || failed || !consent.avatars) {
     return (
       <span
         className={`avatar ${className}`}

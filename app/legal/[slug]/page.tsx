@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Icon } from "@/components/ui/icons";
+import { appEnv } from "@/lib/deployment";
 import { siteConfig } from "@/lib/site";
 import {
   LEGAL_LINKS,
@@ -41,6 +42,14 @@ export default async function LegalPage({ params }: PageProps) {
     notFound();
   }
 
+  const legalIncomplete =
+    !siteConfig.legalName ||
+    !siteConfig.legalAddress ||
+    !siteConfig.legalPhone ||
+    !siteConfig.supportEmail ||
+    !siteConfig.privacyEmail ||
+    !siteConfig.privacyOfficer;
+
   return (
     <>
       <section className="page-hero">
@@ -74,6 +83,20 @@ export default async function LegalPage({ params }: PageProps) {
           </nav>
 
           <div>
+            {legalIncomplete && appEnv !== "production" ? (
+              <div className="cart-login-banner" style={{ marginBottom: 16 }}>
+                <p>
+                  <b>Mentions légales à compléter.</b> Renseigne{" "}
+                  <code>NEXT_PUBLIC_LEGAL_*</code>,{" "}
+                  <code>NEXT_PUBLIC_SUPPORT_EMAIL</code>,{" "}
+                  <code>NEXT_PUBLIC_PRIVACY_EMAIL</code> et{" "}
+                  <code>NEXT_PUBLIC_PRIVACY_OFFICER</code> avant la mise en
+                  production. Le build de production échoue si ces champs
+                  manquent.
+                </p>
+              </div>
+            ) : null}
+
             <article
               className="legal-content"
               dangerouslySetInnerHTML={{ __html: page.html }}

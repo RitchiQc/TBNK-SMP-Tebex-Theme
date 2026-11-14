@@ -78,11 +78,7 @@ export const getWebstore = cache(async (): Promise<Webstore> => {
   if (!raw) {
     throw new Error("Impossible de charger les informations de la boutique Tebex.");
   }
-  const webstore = mapWebstore(unwrapData(raw));
-  if (webstore.disabled) {
-    throw new Error("La boutique Tebex est désactivée.");
-  }
-  return webstore;
+  return mapWebstore(unwrapData(raw));
 });
 
 export const getCategories = cache(async (): Promise<Category[]> => {
@@ -171,6 +167,21 @@ export const getCategoryBySlug = cache(
   }
 );
 
+/**
+ * Variante tolérante aux pannes : une indisponibilité Tebex ne doit pas
+ * produire une erreur 500 sur une page catégorie.
+ */
+export const getCategoryBySlugSafe = cache(
+  async (slug: string): Promise<Category | null> => {
+    try {
+      return await getCategoryBySlug(slug);
+    } catch (error) {
+      console.error("[tebex] category unavailable", error);
+      return null;
+    }
+  }
+);
+
 export const getPackageBySlug = cache(
   async (
     slug: string
@@ -192,9 +203,25 @@ export const getPackageBySlug = cache(
   }
 );
 
+/**
+ * Variante tolérante aux pannes pour les pages package et leurs métadonnées.
+ */
+export const getPackageBySlugSafe = cache(
+  async (
+    slug: string
+  ): Promise<{ pkg: Package; category: Category } | null> => {
+    try {
+      return await getPackageBySlug(slug);
+    } catch (error) {
+      console.error("[tebex] package unavailable", error);
+      return null;
+    }
+  }
+);
+
 export const getPackageById = cache(
   async (id: number): Promise<Package | null> => {
-    const { packages } = await getStoreData();
+    const { packages } = await getStoreDataSafe();
     return packages.find((pkg) => pkg.id === id) ?? null;
   }
 );
@@ -209,7 +236,7 @@ export const getPackageByIdent = cache(
     const key = identifier.trim();
     if (!key) return null;
 
-    const { packages } = await getStoreData();
+    const { packages } = await getStoreDataSafe();
     return (
       packages.find(
         (pkg) =>

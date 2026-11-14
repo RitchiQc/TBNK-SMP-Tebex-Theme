@@ -13,7 +13,11 @@ import {
 import { mapAuthProviders } from "@/lib/tebex/mapper";
 import { getWebstore } from "@/lib/tebex/store";
 import type { CheckoutResult } from "./action-types";
-import { clearMockBasketCookie } from "./cookies";
+import {
+  clearBasketIdentCookie,
+  clearMockBasketCookie,
+  getUsernameCookie
+} from "./cookies";
 import { getCurrentBasket } from "./session";
 
 export async function prepareCheckoutAction(): Promise<CheckoutResult> {
@@ -41,6 +45,20 @@ export async function prepareCheckoutAction(): Promise<CheckoutResult> {
 
     if (!basket || basket.packages.length === 0) {
       return { mode: "error", error: "Ton panier est vide." };
+    }
+
+    const username = await getUsernameCookie();
+    if (
+      username &&
+      basket.username &&
+      basket.username.toLowerCase() !== username.toLowerCase()
+    ) {
+      await clearBasketIdentCookie();
+      return {
+        mode: "error",
+        error:
+          "Ce panier ne correspond pas à ton pseudo. Reconnecte-toi pour continuer."
+      };
     }
 
     if (basket.checkoutUrl) {
@@ -78,6 +96,10 @@ export async function prepareCheckoutAction(): Promise<CheckoutResult> {
 }
 
 export async function clearDemoBasketAction(): Promise<void> {
+  if (!(await rateLimit("basket:demo-clear", 20, 60_000))) {
+    return;
+  }
+
   await clearMockBasketCookie();
   revalidatePath("/cart");
   revalidatePath("/", "layout");

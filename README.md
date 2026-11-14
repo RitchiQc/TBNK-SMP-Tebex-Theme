@@ -66,14 +66,15 @@ Sous Windows, si PowerShell bloque `npm.ps1` à cause de la politique d’exécu
 
 ### Mode démo
 
-Le mode démo s’active automatiquement quand `TEBEX_PUBLIC_TOKEN` est vide :
+Le mode démo s’active automatiquement quand `TEBEX_PUBLIC_TOKEN` est vide **en développement ou en préproduction**. En production, le build/startup échoue si le token manque :
 
 - catalogue fictif dans `data/mock.ts` ;
 - panier simulé ;
 - code promo de test : **TBNK10** (10 %) ;
-- bouton de paiement qui ouvre une explication “mode démo”.
+- bouton de paiement qui ouvre une explication “mode démo” ;
+- bandeau permanent et `noindex` en preview.
 
-Aucun compte Tebex n’est nécessaire pour tester le design, le panier, la connexion et le parcours de commande.
+Aucun compte Tebex n’est nécessaire pour tester le design, le panier, la connexion et le parcours de commande en local.
 
 ## Configuration
 
@@ -90,6 +91,41 @@ NEXT_PUBLIC_SITE_URL="http://localhost:3000"
 
 - `TEBEX_PUBLIC_TOKEN` : token **public** Tebex, disponible dans Creator Panel → Developers → API Keys. Il sert à lire le catalogue et à manipuler le panier. **N’utilise jamais le private key dans ce projet.**
 - `NEXT_PUBLIC_SITE_URL` : URL publique du site, sans slash final. En production : `https://tbnk-smp.com`.
+- `APP_ENV` : `development`, `preview` ou `production`. Sur Vercel, `VERCEL_ENV` est utilisé si `APP_ENV` est absent.
+- `COOKIE_SECRET` : secret de signature des cookies, **obligatoire en production** (32 caractères minimum). Génère-le avec `openssl rand -base64 48`.
+- `NEXT_PUBLIC_LEGAL_*`, `NEXT_PUBLIC_SUPPORT_EMAIL`, `NEXT_PUBLIC_PRIVACY_EMAIL`, `NEXT_PUBLIC_PRIVACY_OFFICER` : identité légale et contacts **obligatoires en production** pour la LPC et la Loi 25.
+- `NEXT_PUBLIC_PRICES_INCLUDE_TAXES` : `true` si les prix Tebex incluent déjà les taxes, sinon `false`.
+
+### Environnements et mode démo
+
+| Environnement | Détection | Token Tebex | URL | Indexation | Paiement |
+|---|---|---|---|---|---|
+| Développement | `APP_ENV=development` | optionnel ; absent → démo | `http://localhost:3000` | non | simulé |
+| Préproduction | `APP_ENV=preview` ou `VERCEL_ENV=preview` | absent → démo ; sinon token de **test** | URL de preview | **noindex + protection Vercel** | simulé ou test |
+| Production | `APP_ENV=production` ou `VERCEL_ENV=production` | **obligatoire** | HTTPS public | indexation | réel |
+
+Règles importantes :
+
+- En production, le build/startup **échoue** si `TEBEX_PUBLIC_TOKEN`, `NEXT_PUBLIC_SITE_URL`, `COOKIE_SECRET` ou les mentions légales obligatoires manquent.
+- `ALLOW_DEMO=true` est ignoré/interdit en production.
+- En preview Vercel sans token, la démo est active automatiquement ; le site est `noindex` et un bandeau « Démo/Préproduction » est affiché.
+- Ne jamais utiliser le token Tebex de production dans une preview : utilise une boutique/token de test séparé.
+- En développement, le bouton de paiement ouvre le modal de démonstration ; aucun paiement réel n’est effectué.
+
+### Conformité Québec (Loi 25, LPC, langue française)
+
+Avant une ouverture publique au Québec :
+
+- désigner un **responsable de la protection des renseignements personnels** et publier ses coordonnées ;
+- compléter la politique de confidentialité (finalités, droits, témoins, tiers, transferts hors Québec, incidents, mineurs de moins de 14 ans, plainte CAI) ;
+- recueillir un **consentement explicite** pour les témoins non nécessaires (YouTube, avatars mc-heads) et permettre le retrait à tout moment ;
+- fournir l’identité, l’adresse, le téléphone et le courriel du commerçant avant l’achat ;
+- afficher clairement les taxes et le total avant paiement ;
+- vérifier que Tebex envoie un **reçu/contrat en français** dans les 15 jours et que le checkout est en français ;
+- faire valider les conditions et la politique de remboursement par un juriste québécois ;
+- conserver une politique interne de gouvernance, un registre des incidents et une EFVP pour les transferts hors Québec.
+
+Le site affiche un avertissement en développement/préproduction si les champs légaux sont incomplets. Un build de production échoue tant qu’ils ne sont pas renseignés.
 
 Après avoir ajouté le token, redémarre le serveur. Le badge “Démo” disparaît et les produits viennent de ta boutique Tebex.
 
@@ -156,6 +192,15 @@ Le statut du serveur restera sur **“En préparation”** tant que `play.tbnk-s
 npm run build
 npm run start
 ```
+
+`npm run build` sans variables compile en mode développement. En revanche, `npm run start` sans `APP_ENV`/`VERCEL_ENV` est volontairement traité comme une **production** : il exige le token, l’URL publique, `COOKIE_SECRET` et les mentions légales. Pour tester localement le build en mode démo, utilise :
+
+```powershell
+$env:APP_ENV='development'
+& 'C:\Program Files\nodejs\npm.cmd' run start
+```
+
+ou plus simplement `npm run dev` pour le développement quotidien.
 
 Le build utilise `next/font/google` pour Montserrat et Pixelify Sans : une connexion réseau est nécessaire au build pour télécharger les polices. Les polices sont ensuite servies par le site.
 
@@ -342,12 +387,13 @@ Si Edge n’est pas au chemin par défaut, définis `EDGE_PATH`.
 ## Sécurité
 
 - Le **public token** Tebex est utilisé côté serveur. Le private key n’est jamais présent dans le code.
-- Les cookies de panier et de pseudo sont `httpOnly`, `sameSite=lax`, et `secure` en production.
-- Les Server Actions valident les quantités, les variables, les identifiants de package et les chemins de redirection. Le cookie `tbnk_pending_add` est revalidé avant usage.
+- Les cookies de panier et de pseudo sont `httpOnly`, `sameSite=lax`, `secure` en production, signés par HMAC et préfixés `__Host-` en production.
+- Les Server Actions valident les quantités, les variables, les identifiants de package et les chemins de redirection. Le cookie `tbnk_pending_add` est signé et revalidé avant usage.
 - Les descriptions Tebex sont nettoyées avec une allowlist (`sanitize-html`) avant rendu, et le JSON-LD est échappé.
 - Les réponses d’erreur Tebex ne sont pas renvoyées telles quelles au client.
-- Des headers de sécurité (CSP minimale, `X-Frame-Options`, `nosniff`, HSTS, `Referrer-Policy`) sont configurés.
-- Le rate limiting fourni est best-effort et local à l’instance ; pour un déploiement multi-instance, ajouter Vercel WAF ou Upstash.
+- Une CSP complète est configurée (scripts, styles, images, frames, connect, form-action, frame-ancestors), avec `X-Frame-Options`, `nosniff`, HSTS et `Referrer-Policy`.
+- Tebex.js n’est chargé qu’au clic sur « Passer au paiement » ; YouTube et mc-heads sont soumis au consentement.
+- Le rate limiting fourni est best-effort et local à l’instance ; pour un déploiement multi-instance, ajouter Vercel WAF ou Upstash. `TRUST_PROXY` doit être configuré en self-hosted.
 - Les prix et la disponibilité sont lus depuis Tebex ; le site ne fait pas confiance à un prix envoyé par le client.
 - Les textes légaux et la mention **Tebex merchant of record** sont inclus dans le footer. Ne les supprime pas sans raison légale.
 - Les images de packages et les descriptions viennent de ton tableau de bord Tebex : garde ton compte Tebex sécurisé.

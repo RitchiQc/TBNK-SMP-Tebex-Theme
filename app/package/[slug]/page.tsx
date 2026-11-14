@@ -4,11 +4,15 @@ import { notFound } from "next/navigation";
 import { PackageGallery } from "@/components/package/package-gallery";
 import { PackagePurchase } from "@/components/package/package-purchase";
 import { ProductCard } from "@/components/store/product-card";
+import { StoreUnavailable } from "@/components/store/store-unavailable";
 import { Icon } from "@/components/ui/icons";
 import { getCurrentBasketSafe } from "@/lib/basket/session";
 import { stripHtml, truncate } from "@/lib/format";
 import { siteConfig } from "@/lib/site";
-import { getPackageBySlug, getStoreData } from "@/lib/tebex/store";
+import {
+  getPackageBySlugSafe,
+  getStoreDataSafe
+} from "@/lib/tebex/store";
 
 type PageProps = {
   params: Promise<{ slug: string }>;
@@ -18,7 +22,7 @@ export async function generateMetadata({
   params
 }: PageProps): Promise<Metadata> {
   const { slug } = await params;
-  const result = await getPackageBySlug(slug);
+  const result = await getPackageBySlugSafe(slug);
 
   if (!result) {
     notFound();
@@ -43,14 +47,26 @@ export async function generateMetadata({
 
 export default async function PackagePage({ params }: PageProps) {
   const { slug } = await params;
-  const [result, { webstore }, basket] = await Promise.all([
-    getPackageBySlug(slug),
-    getStoreData(),
+  const [result, { webstore, unavailable }, basket] = await Promise.all([
+    getPackageBySlugSafe(slug),
+    getStoreDataSafe(),
     getCurrentBasketSafe()
   ]);
 
   if (!result) {
+    if (unavailable) {
+      return <StoreUnavailable />;
+    }
     notFound();
+  }
+
+  if (webstore.disabled) {
+    return (
+      <StoreUnavailable
+        title="Boutique temporairement fermée"
+        message="La boutique est momentanément fermée. Reviens bientôt ou rejoins le Discord pour être informé de la réouverture."
+      />
+    );
   }
 
   const { pkg, category } = result;

@@ -92,6 +92,7 @@ export function initials(name: string | null | undefined): string {
 }
 
 const REDIRECT_ORIGIN = "https://internal.invalid";
+const MAX_REDIRECT_PATH_LENGTH = 2048;
 
 /**
  * Valide un chemin de redirection interne.
@@ -103,7 +104,11 @@ const REDIRECT_ORIGIN = "https://internal.invalid";
  * vérifie que l'origine reste interne.
  */
 export function safeRedirectPath(value: unknown): string {
-  if (typeof value !== "string" || value.length === 0) {
+  if (
+    typeof value !== "string" ||
+    value.length === 0 ||
+    value.length > MAX_REDIRECT_PATH_LENGTH
+  ) {
     return "/";
   }
 

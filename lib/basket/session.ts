@@ -18,6 +18,30 @@ import {
 } from "./cookies";
 import { buildMockBasket, parseMockBasketData } from "./mock";
 
+const INVALID_BASKET_TTL = 60_000;
+const MAX_INVALID_BASKET_ENTRIES = 1000;
+const invalidBasketCache = new Map<string, number>();
+
+function isRecentlyInvalidBasket(ident: string): boolean {
+  const expiresAt = invalidBasketCache.get(ident);
+  if (!expiresAt) return false;
+
+  if (expiresAt <= Date.now()) {
+    invalidBasketCache.delete(ident);
+    return false;
+  }
+
+  return true;
+}
+
+function markInvalidBasket(ident: string): void {
+  if (invalidBasketCache.size >= MAX_INVALID_BASKET_ENTRIES) {
+    const oldest = invalidBasketCache.keys().next().value;
+    if (oldest) invalidBasketCache.delete(oldest);
+  }
+  invalidBasketCache.set(ident, Date.now() + INVALID_BASKET_TTL);
+}
+
 function unwrapBasket(raw: unknown): unknown {
   if (
     raw &&
@@ -59,9 +83,13 @@ export const getCurrentBasket = cache(async (): Promise<Basket | null> => {
 
   const ident = await getBasketIdentCookie();
   if (!ident) return null;
+  if (isRecentlyInvalidBasket(ident)) return null;
 
   const raw = await getBasketRaw(ident);
-  if (!raw) return null;
+  if (!raw) {
+    markInvalidBasket(ident);
+    return null;
+  }
 
   return mapBasket(unwrapBasket(raw));
 });
@@ -81,7 +109,23 @@ export async function ensureBasket(
   }
 
   const existing = options?.forceNew ? null : await getCurrentBasket();
-  if (existing) return existing;
+  if (existing) {
+    const requestedUsername = username ?? (await getUsernameCookie());
+    const basketUsername = existing.username;
+
+    // Un panier existant ne doit jamais être réutilisé pour un autre pseudo :
+    // cela évite les scénarios de fixation de panier et les livraisons au
+    // mauvais joueur.
+    if (
+      !requestedUsername ||
+      !basketUsername ||
+      basketUsername.toLowerCase() === requestedUsername.toLowerCase()
+    ) {
+      return existing;
+    }
+
+    await clearBasketIdentCookie();
+  }
 
   const resolvedUsername = username ?? (await getUsernameCookie()) ?? undefined;
   const raw = await createBasketRaw(resolvedUsername);

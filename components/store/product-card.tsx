@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { addToBasketAction } from "@/lib/basket/actions";
 import { formatCurrency } from "@/lib/format";
+import { siteConfig } from "@/lib/site";
 import type { Package } from "@/lib/tebex/types";
 import { Icon } from "@/components/ui/icons";
 import { useToast } from "@/components/ui/toast";
@@ -87,6 +88,7 @@ export function ProductCard({
           src={image}
           alt={pkg.name}
           decoding="async"
+          loading="lazy"
           onError={() => setImageError(true)}
         />
       </Link>
@@ -114,8 +116,11 @@ export function ProductCard({
                 : formatCurrency(pkg.totalPrice, currency)}
             </strong>
             {isSubscription ? (
-              <span className="price__suffix">/ période</span>
+              <span className="price__suffix">
+                {pkg.billingPeriod ? ` / ${pkg.billingPeriod}` : " / période"}
+              </span>
             ) : null}
+            <span className="price__tax">{siteConfig.taxNote}</span>
           </div>
 
           <div className="product-card__actions">

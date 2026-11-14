@@ -1,6 +1,7 @@
 import { percentOff } from "@/lib/format";
 import { siteConfig } from "@/lib/site";
 import { sanitizeDescription } from "./sanitize";
+import { isAllowedTebexUrl, isHttpsUrl } from "./urls";
 import type {
   AuthProvider,
   Basket,
@@ -49,12 +50,9 @@ function toPackageType(value: unknown): PackageType {
   return "single";
 }
 
-function isHttpsUrl(value: string): boolean {
-  try {
-    return new URL(value).protocol === "https:";
-  } catch {
-    return false;
-  }
+function toHttpsUrl(value: unknown): string | null {
+  const candidate = toNullableStr(value);
+  return candidate && isHttpsUrl(candidate) ? candidate : null;
 }
 
 function toVariableType(value: unknown): PackageVariableType {
@@ -77,7 +75,7 @@ export function mapWebstore(raw: unknown): Webstore {
   return {
     name: toStr(source.name, siteConfig.name),
     description: toStr(source.description, siteConfig.description),
-    logo: toNullableStr(source.logo),
+    logo: toHttpsUrl(source.logo),
     currency: toStr(source.currency, siteConfig.currency).toUpperCase(),
     lang: toStr(source.lang, "fr"),
     platformType: toStr(source.platform_type, "Minecraft: Java Edition"),
@@ -89,13 +87,23 @@ export function mapWebstore(raw: unknown): Webstore {
 
 function mapMedia(raw: unknown): PackageMedia[] {
   if (!Array.isArray(raw)) return [];
-  return raw.filter(isRecord).map((item) => ({
-    type: item.type === "video" ? "video" : "image",
-    url: toStr(item.url),
-    name: toNullableStr(item.name),
-    primary: toBool(item.primary),
-    featured: toBool(item.featured)
-  }));
+
+  const media: PackageMedia[] = [];
+  for (const item of raw) {
+    if (!isRecord(item)) continue;
+    const url = toHttpsUrl(item.url);
+    if (!url) continue;
+
+    media.push({
+      type: item.type === "video" ? "video" : "image",
+      url,
+      name: toNullableStr(item.name),
+      primary: toBool(item.primary),
+      featured: toBool(item.featured)
+    });
+  }
+
+  return media;
 }
 
 function mapVariableOptions(raw: unknown): PackageVariableOption[] {
@@ -154,7 +162,7 @@ export function mapCategory(raw: unknown): Category {
     name,
     slug,
     description: sanitizeDescription(toStr(source.description)),
-    imageUrl: toNullableStr(source.image_url),
+    imageUrl: toHttpsUrl(source.image_url),
     displayType: source.display_type === "list" ? "list" : "grid",
     order: toNum(source.order),
     tiered: toBool(source.tiered),
@@ -171,7 +179,7 @@ export function mapPackage(
   const source = isRecord(raw) ? raw : {};
   const id = toNum(source.id);
   const media = mapMedia(source.media);
-  const image = toNullableStr(source.image) ?? media[0]?.url ?? null;
+  const image = toHttpsUrl(source.image) ?? media[0]?.url ?? null;
   const basePrice = toNum(source.base_price);
   const totalPrice = toNum(source.total_price, basePrice);
   const discount = Math.max(0, basePrice - totalPrice, toNum(source.discount));
@@ -206,6 +214,9 @@ export function mapPackage(
     totalPrice,
     currency: toStr(source.currency, siteConfig.currency).toUpperCase(),
     expirationDate: toNullableStr(source.expiration_date),
+    billingPeriod:
+      toNullableStr(source.expiry_period) ??
+      toNullableStr(source.expiryPeriod),
     categoryId: category.id,
     categoryName: category.name,
     categorySlug: category.slug,
@@ -232,7 +243,7 @@ function mapBasketPackage(raw: unknown): BasketPackage {
     name: toStr(source.name, "Package"),
     slug: toStr(source.slug, ident),
     description: toStr(source.description),
-    image: toNullableStr(source.image),
+    image: toHttpsUrl(source.image),
     type: toPackageType(source.type),
     quantity: toNum(inBasket.quantity, 1),
     price: toNum(inBasket.price),
@@ -275,8 +286,7 @@ export function mapBasket(raw: unknown): Basket {
       .map((item) => ({ cardNumber: toStr(item.card_number) }))
       .filter((item) => item.cardNumber.length > 0),
     creatorCode: toNullableStr(source.creator_code),
-    checkoutUrl:
-      checkoutUrl && isHttpsUrl(checkoutUrl) ? checkoutUrl : null,
+    checkoutUrl: isAllowedTebexUrl(checkoutUrl) ? checkoutUrl : null,
     isMock: false
   };
 }
@@ -295,6 +305,6 @@ export function mapAuthProviders(raw: unknown): AuthProvider[] {
       (item) =>
         item.name.length > 0 &&
         item.url.length > 0 &&
-        isHttpsUrl(item.url)
+        isAllowedTebexUrl(item.url)
     );
 }

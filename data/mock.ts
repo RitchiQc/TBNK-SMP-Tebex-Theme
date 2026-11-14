@@ -58,6 +58,7 @@ function seedPackage(
     totalPrice,
     currency: siteConfig.currency,
     expirationDate: null,
+    billingPeriod: seed.billingPeriod ?? null,
     categoryId: category.id,
     categoryName: category.name,
     categorySlug: category.slug,
