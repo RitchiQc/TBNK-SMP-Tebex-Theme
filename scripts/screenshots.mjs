@@ -3,8 +3,11 @@ import path from "node:path";
 import { chromium } from "playwright-core";
 
 const EDGE_PATH =
+  process.env.BROWSER_PATH ??
   process.env.EDGE_PATH ??
-  "C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe";
+  (process.platform === "win32"
+    ? "C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe"
+    : undefined);
 const BASE_URL = process.env.BASE_URL ?? "http://localhost:3000";
 const OUT_DIR = path.resolve("preview-output");
 
@@ -194,7 +197,7 @@ async function main() {
   await mkdir(OUT_DIR, { recursive: true });
 
   const browser = await chromium.launch({
-    executablePath: EDGE_PATH,
+    ...(EDGE_PATH ? { executablePath: EDGE_PATH } : {}),
     headless: true
   });
 

@@ -43,7 +43,7 @@ export function CartLine({
     if (next === item.quantity) return;
 
     startTransition(async () => {
-      const result = await updateQuantityAction(item.id, next);
+      const result = await updateQuantityAction(item.ident, next);
       if (result.success) {
         toast(result.message ?? "Quantité mise à jour.", {
           variant: "success"
@@ -62,7 +62,7 @@ export function CartLine({
 
   function remove() {
     startTransition(async () => {
-      const result = await removeFromBasketAction(item.id);
+      const result = await removeFromBasketAction(item.ident);
       if (result.success) {
         toast(result.message ?? "Package retiré.", { variant: "success" });
         router.refresh();

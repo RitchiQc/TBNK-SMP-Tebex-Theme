@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { StoreCatalog } from "@/components/store/store-catalog";
 import { Icon } from "@/components/ui/icons";
-import { getCurrentBasket } from "@/lib/basket/session";
+import { getCurrentBasketSafe } from "@/lib/basket/session";
 import { siteConfig } from "@/lib/site";
-import { getStoreData } from "@/lib/tebex/store";
+import { getStoreDataSafe } from "@/lib/tebex/store";
 
 export const metadata: Metadata = {
   title: "Boutique",
@@ -14,10 +14,8 @@ export const metadata: Metadata = {
 };
 
 export default async function StorePage() {
-  const [{ webstore, categories, packages }, basket] = await Promise.all([
-    getStoreData(),
-    getCurrentBasket()
-  ]);
+  const [{ webstore, categories, packages, unavailable }, basket] =
+    await Promise.all([getStoreDataSafe(), getCurrentBasketSafe()]);
 
   const basketQuantities: Record<number, number> = {};
   for (const item of basket?.packages ?? []) {
@@ -61,7 +59,29 @@ export default async function StorePage() {
         </div>
       </section>
 
-      {categories.length === 0 ? (
+      {unavailable ? (
+        <section className="container-tbnk section">
+          <div className="empty-state">
+            <span className="empty-state__icon">
+              <Icon name="package" size={24} />
+            </span>
+            <h2>Boutique temporairement indisponible</h2>
+            <p>
+              Le catalogue Tebex ne répond pas pour le moment. Réessaie dans un
+              instant ou rejoins le Discord pour être informé.
+            </p>
+            <a
+              href={siteConfig.discordUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn btn-primary btn-sm"
+            >
+              <Icon name="discord" size={15} />
+              Rejoindre le Discord
+            </a>
+          </div>
+        </section>
+      ) : categories.length === 0 ? (
         <section className="container-tbnk section">
           <div className="empty-state">
             <span className="empty-state__icon">

@@ -61,7 +61,9 @@ export function HeaderClient({
   };
 
   const isShopActive =
-    pathname === "/store" || pathname.startsWith("/package/");
+    pathname === "/store" ||
+    pathname.startsWith("/store/") ||
+    pathname.startsWith("/package/");
 
   return (
     <>

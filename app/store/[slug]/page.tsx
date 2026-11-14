@@ -3,7 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { StoreCatalog } from "@/components/store/store-catalog";
 import { Icon } from "@/components/ui/icons";
-import { getCurrentBasket } from "@/lib/basket/session";
+import { getCurrentBasketSafe } from "@/lib/basket/session";
 import { stripHtml } from "@/lib/format";
 import { siteConfig } from "@/lib/site";
 import { getCategoryBySlug, getStoreData } from "@/lib/tebex/store";
@@ -19,7 +19,7 @@ export async function generateMetadata({
   const category = await getCategoryBySlug(slug);
 
   if (!category) {
-    return { title: "Catégorie introuvable" };
+    notFound();
   }
 
   const description = stripHtml(category.description).slice(0, 160);
@@ -38,7 +38,7 @@ export default async function CategoryPage({ params }: PageProps) {
   const [category, { webstore, categories }, basket] = await Promise.all([
     getCategoryBySlug(slug),
     getStoreData(),
-    getCurrentBasket()
+    getCurrentBasketSafe()
   ]);
 
   if (!category) {

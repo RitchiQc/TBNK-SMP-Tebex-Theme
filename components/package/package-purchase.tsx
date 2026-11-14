@@ -51,7 +51,7 @@ export function PackagePurchase({
   function add() {
     startTransition(async () => {
       const result = await addToBasketAction({
-        packageId: pkg.id,
+        packageId: pkg.ident,
         quantity: isSubscription || pkg.disableQuantity ? 1 : quantity,
         variableData: pkg.variables.length > 0 ? variableValues : undefined,
         returnPath
@@ -210,7 +210,10 @@ export function PackagePurchase({
         ) : null}
       </div>
 
-      <div className="package-benefits">
+      <ul
+        className="package-benefits"
+        style={{ listStyle: "none", padding: 0 }}
+      >
         <li>
           <Icon name="check-circle" size={14} />
           Livraison instantanée en jeu après paiement
@@ -223,7 +226,7 @@ export function PackagePurchase({
           <Icon name="discord" size={14} />
           Support disponible sur Discord
         </li>
-      </div>
+      </ul>
 
       <p className="purchase-panel__note">
         En achetant, tu acceptes les{" "}

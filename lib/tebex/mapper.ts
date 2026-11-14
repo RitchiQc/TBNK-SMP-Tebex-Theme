@@ -1,5 +1,6 @@
 import { percentOff } from "@/lib/format";
 import { siteConfig } from "@/lib/site";
+import { sanitizeDescription } from "./sanitize";
 import type {
   AuthProvider,
   Basket,
@@ -48,6 +49,14 @@ function toPackageType(value: unknown): PackageType {
   return "single";
 }
 
+function isHttpsUrl(value: string): boolean {
+  try {
+    return new URL(value).protocol === "https:";
+  } catch {
+    return false;
+  }
+}
+
 function toVariableType(value: unknown): PackageVariableType {
   const allowed: PackageVariableType[] = [
     "dropdown",
@@ -69,7 +78,7 @@ export function mapWebstore(raw: unknown): Webstore {
     name: toStr(source.name, siteConfig.name),
     description: toStr(source.description, siteConfig.description),
     logo: toNullableStr(source.logo),
-    currency: toStr(source.currency, siteConfig.currency),
+    currency: toStr(source.currency, siteConfig.currency).toUpperCase(),
     lang: toStr(source.lang, "fr"),
     platformType: toStr(source.platform_type, "Minecraft: Java Edition"),
     supportsUsernames: toBool(source.supports_usernames, true),
@@ -144,7 +153,7 @@ export function mapCategory(raw: unknown): Category {
     id,
     name,
     slug,
-    description: toStr(source.description),
+    description: sanitizeDescription(toStr(source.description)),
     imageUrl: toNullableStr(source.image_url),
     displayType: source.display_type === "list" ? "list" : "grid",
     order: toNum(source.order),
@@ -188,14 +197,14 @@ export function mapPackage(
     ident,
     name: toStr(source.name, "Package"),
     slug: toStr(source.slug, ident),
-    description: toStr(source.description),
+    description: sanitizeDescription(toStr(source.description)),
     image,
     media: primaryMedia,
     type,
     basePrice,
     discount,
     totalPrice,
-    currency: toStr(source.currency, siteConfig.currency),
+    currency: toStr(source.currency, siteConfig.currency).toUpperCase(),
     expirationDate: toNullableStr(source.expiration_date),
     categoryId: category.id,
     categoryName: category.name,
@@ -244,11 +253,12 @@ export function mapBasket(raw: unknown): Basket {
   const couponsRaw = Array.isArray(source.coupons) ? source.coupons : [];
   const giftcardsRaw = Array.isArray(source.giftcards) ? source.giftcards : [];
   const links = isRecord(source.links) ? source.links : {};
+  const checkoutUrl = toNullableStr(links.checkout);
 
   return {
     ident: toStr(source.ident),
     username: toNullableStr(source.username),
-    currency: toStr(source.currency, siteConfig.currency),
+    currency: toStr(source.currency, siteConfig.currency).toUpperCase(),
     basePrice: toNum(source.base_price),
     salesTax: toNum(source.sales_tax),
     totalPrice: toNum(source.total_price),
@@ -265,7 +275,8 @@ export function mapBasket(raw: unknown): Basket {
       .map((item) => ({ cardNumber: toStr(item.card_number) }))
       .filter((item) => item.cardNumber.length > 0),
     creatorCode: toNullableStr(source.creator_code),
-    checkoutUrl: toNullableStr(links.checkout),
+    checkoutUrl:
+      checkoutUrl && isHttpsUrl(checkoutUrl) ? checkoutUrl : null,
     isMock: false
   };
 }
@@ -280,5 +291,10 @@ export function mapAuthProviders(raw: unknown): AuthProvider[] {
       name: toStr(item.name),
       url: toStr(item.url)
     }))
-    .filter((item) => item.name.length > 0 && item.url.length > 0);
+    .filter(
+      (item) =>
+        item.name.length > 0 &&
+        item.url.length > 0 &&
+        isHttpsUrl(item.url)
+    );
 }

@@ -1,13 +1,13 @@
 import Link from "next/link";
 import { getDiscordStats } from "@/lib/community/discord";
 import { siteConfig } from "@/lib/site";
-import { getStoreData } from "@/lib/tebex/store";
+import { getStoreDataSafe } from "@/lib/tebex/store";
 import { CopyButton } from "@/components/ui/copy-button";
 import { Icon } from "@/components/ui/icons";
 
 export async function SiteFooter() {
   const [{ webstore, categories }, discord] = await Promise.all([
-    getStoreData(),
+    getStoreDataSafe(),
     getDiscordStats()
   ]);
 

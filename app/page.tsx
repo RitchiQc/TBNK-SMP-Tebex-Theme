@@ -5,7 +5,7 @@ import { Icon } from "@/components/ui/icons";
 import { getDiscordStats } from "@/lib/community/discord";
 import { getServerStatus } from "@/lib/community/server";
 import { siteConfig } from "@/lib/site";
-import { getStoreData } from "@/lib/tebex/store";
+import { getStoreDataSafe } from "@/lib/tebex/store";
 
 export const metadata: Metadata = {
   title: { absolute: "TBNK-SMP — Serveur Minecraft Java" },
@@ -18,12 +18,13 @@ export default async function HomePage({
 }: {
   searchParams: Promise<{ checkout?: string }>;
 }) {
-  const [{ packages }, serverStatus, discord, params] = await Promise.all([
-    getStoreData(),
-    getServerStatus(),
-    getDiscordStats(),
-    searchParams
-  ]);
+  const [{ packages, unavailable }, serverStatus, discord, params] =
+    await Promise.all([
+      getStoreDataSafe(),
+      getServerStatus(),
+      getDiscordStats(),
+      searchParams
+    ]);
 
   return (
     <>
@@ -43,6 +44,26 @@ export default async function HomePage({
             >
               <Icon name="discord" size={14} />
               Support Discord
+            </a>
+          </div>
+        </div>
+      ) : null}
+
+      {unavailable ? (
+        <div className="container-tbnk" style={{ paddingTop: 20 }}>
+          <div className="cart-login-banner">
+            <p>
+              <b>Boutique temporairement indisponible.</b> Le catalogue Tebex ne
+              répond pas pour le moment. Le serveur, le guide et les pages
+              légales restent accessibles.
+            </p>
+            <a
+              href={siteConfig.discordUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn btn-secondary btn-sm"
+            >
+              <Icon name="discord" size={14} /> Support Discord
             </a>
           </div>
         </div>

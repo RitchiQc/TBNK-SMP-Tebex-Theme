@@ -18,6 +18,7 @@ export const getDiscordStats = cache(async (): Promise<DiscordStats> => {
       )}?with_counts=true&with_expiration=true`,
       {
         next: { revalidate: 300 },
+        signal: AbortSignal.timeout(4000),
         headers: {
           Accept: "application/json",
           "User-Agent": "TBNK-SMP-Storefront/1.0"

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import Script from "next/script";
 import { CartLine } from "@/components/cart/cart-line";
 import { CheckoutButton } from "@/components/cart/checkout-button";
 import { CouponForm } from "@/components/cart/coupon-form";
@@ -119,7 +120,13 @@ export default async function CartPage() {
                     <span>Sous-total</span>
                     <strong>{formatCurrency(basket.basePrice, currency)}</strong>
                   </div>
-                  {basket.basePrice > basket.totalPrice ? (
+                  {/*
+                    Tebex retourne `base_price` déjà net des remises et
+                    `total_price = base_price + sales_tax`. Déduire une remise
+                    de `basePrice - totalPrice` serait donc faux dès qu'il y a
+                    des taxes. On ne l'affiche qu'en mode démo, où salesTax = 0.
+                  */}
+                  {basket.isMock && basket.basePrice > basket.totalPrice ? (
                     <div className="summary-row summary-row--discount">
                       <span>Réductions</span>
                       <strong>
@@ -172,6 +179,13 @@ export default async function CartPage() {
           </>
         )}
       </div>
+
+      {!isEmpty ? (
+        <Script
+          src="https://js.tebex.io/v/1.js"
+          strategy="afterInteractive"
+        />
+      ) : null}
     </>
   );
 }

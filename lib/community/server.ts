@@ -26,6 +26,7 @@ export const getServerStatus = cache(async (): Promise<ServerStatus> => {
       `https://api.mcsrvstat.us/3/${encodeURIComponent(siteConfig.javaIp)}`,
       {
         next: { revalidate: 60 },
+        signal: AbortSignal.timeout(4000),
         headers: {
           Accept: "application/json",
           "User-Agent": "TBNK-SMP-Storefront/1.0"

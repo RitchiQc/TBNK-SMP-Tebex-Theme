@@ -1,3 +1,5 @@
+import "server-only";
+
 import { cache } from "react";
 import { mockCategories, mockPackages, mockWebstore } from "@/data/mock";
 import { siteConfig } from "@/lib/site";
@@ -7,7 +9,46 @@ import {
   isMockMode
 } from "./client";
 import { mapCategory, mapWebstore } from "./mapper";
-import type { Category, Package, StoreData, Webstore } from "./types";
+import type {
+  Category,
+  Package,
+  StoreData,
+  Webstore
+} from "./types";
+
+const FALLBACK_WEBSTORE: Webstore = {
+  name: siteConfig.name,
+  description: siteConfig.description,
+  logo: null,
+  currency: siteConfig.currency,
+  lang: "fr",
+  platformType: "Minecraft: Java Edition",
+  supportsUsernames: true,
+  supportsGifting: false,
+  disabled: false
+};
+
+export type SafeStoreData = StoreData & { unavailable: boolean };
+
+function unwrapData(raw: unknown): unknown {
+  if (
+    raw &&
+    typeof raw === "object" &&
+    "data" in raw &&
+    (raw as Record<string, unknown>).data !== undefined
+  ) {
+    return (raw as Record<string, unknown>).data;
+  }
+  return raw;
+}
+
+function decodeSlug(slug: string): string {
+  try {
+    return decodeURIComponent(slug);
+  } catch {
+    return slug;
+  }
+}
 
 function sortCategories(categories: Category[]): Category[] {
   return categories
@@ -37,7 +78,11 @@ export const getWebstore = cache(async (): Promise<Webstore> => {
   if (!raw) {
     throw new Error("Impossible de charger les informations de la boutique Tebex.");
   }
-  return mapWebstore(raw);
+  const webstore = mapWebstore(unwrapData(raw));
+  if (webstore.disabled) {
+    throw new Error("La boutique Tebex est désactivée.");
+  }
+  return webstore;
 });
 
 export const getCategories = cache(async (): Promise<Category[]> => {
@@ -78,6 +123,27 @@ export const getStoreData = cache(async (): Promise<StoreData> => {
   };
 });
 
+/**
+ * Version tolérante aux pannes de Tebex, utilisée par le layout global.
+ * Une panne du catalogue ne doit pas empêcher d'afficher les pages légales,
+ * le guide ou le statut du serveur.
+ */
+export const getStoreDataSafe = cache(async (): Promise<SafeStoreData> => {
+  try {
+    const data = await getStoreData();
+    return { ...data, unavailable: false };
+  } catch (error) {
+    console.error("[tebex] storefront unavailable", error);
+    return {
+      webstore: FALLBACK_WEBSTORE,
+      categories: [],
+      packages: [],
+      isMock: false,
+      unavailable: true
+    };
+  }
+});
+
 export const getAllPackages = cache(async (): Promise<Package[]> => {
   const { packages } = await getStoreData();
   return packages;
@@ -94,7 +160,7 @@ export const getFeaturedPackages = cache(
 
 export const getCategoryBySlug = cache(
   async (slug: string): Promise<Category | null> => {
-    const key = decodeURIComponent(slug);
+    const key = decodeSlug(slug);
     const { categories } = await getStoreData();
     return (
       categories.find(
@@ -109,7 +175,7 @@ export const getPackageBySlug = cache(
   async (
     slug: string
   ): Promise<{ pkg: Package; category: Category } | null> => {
-    const key = decodeURIComponent(slug);
+    const key = decodeSlug(slug);
     const { categories } = await getStoreData();
 
     for (const category of categories) {
@@ -130,5 +196,27 @@ export const getPackageById = cache(
   async (id: number): Promise<Package | null> => {
     const { packages } = await getStoreData();
     return packages.find((pkg) => pkg.id === id) ?? null;
+  }
+);
+
+/**
+ * Retrouve un package par identifiant Tebex (`ident`), slug ou ID numérique.
+ * L'API recommande `ident` pour tous les types de packages, notamment les
+ * packages external/dynamic.
+ */
+export const getPackageByIdent = cache(
+  async (identifier: string): Promise<Package | null> => {
+    const key = identifier.trim();
+    if (!key) return null;
+
+    const { packages } = await getStoreData();
+    return (
+      packages.find(
+        (pkg) =>
+          pkg.ident === key ||
+          pkg.slug === key ||
+          String(pkg.id) === key
+      ) ?? null
+    );
   }
 );

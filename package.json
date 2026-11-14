@@ -11,21 +11,25 @@
     "build": "next build",
     "start": "next start",
     "typecheck": "tsc --noEmit",
-    "test": "npm run typecheck && npm run test:e2e",
+    "test": "npm run typecheck && npm run test:e2e && npm run test:security",
     "test:e2e": "node scripts/e2e.mjs",
+    "test:security": "node scripts/security-e2e.mjs",
     "validate": "node scripts/validate.mjs",
     "screenshots": "node scripts/screenshots.mjs"
   },
   "dependencies": {
     "next": "16.4.6",
     "react": "19.3.1",
-    "react-dom": "19.3.1"
+    "react-dom": "19.3.1",
+    "sanitize-html": "^2.18.2",
+    "server-only": "^0.0.1"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "4.3.5",
     "@types/node": "^22",
     "@types/react": "19.3.0",
     "@types/react-dom": "19.3.0",
+    "@types/sanitize-html": "^2.16.2",
     "playwright-core": "1.65.1",
     "tailwindcss": "4.3.5",
     "typescript": "5.9.3"

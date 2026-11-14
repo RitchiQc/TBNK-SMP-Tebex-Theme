@@ -5,7 +5,7 @@ import { Icon } from "@/components/ui/icons";
 import { getDiscordStats } from "@/lib/community/discord";
 import { getServerStatus } from "@/lib/community/server";
 import { siteConfig } from "@/lib/site";
-import { getStoreData } from "@/lib/tebex/store";
+import { getStoreDataSafe } from "@/lib/tebex/store";
 
 export const metadata: Metadata = {
   title: "Statut du serveur",
@@ -15,11 +15,12 @@ export const metadata: Metadata = {
 };
 
 export default async function StatusPage() {
-  const [serverStatus, discord, { categories, packages }] = await Promise.all([
-    getServerStatus(),
-    getDiscordStats(),
-    getStoreData()
-  ]);
+  const [serverStatus, discord, { webstore, categories, packages, unavailable }] =
+    await Promise.all([
+      getServerStatus(),
+      getDiscordStats(),
+      getStoreDataSafe()
+    ]);
 
   const online = serverStatus.online;
 
@@ -41,7 +42,7 @@ export default async function StatusPage() {
                 {online ? "En ligne" : "En préparation"}
               </span>
               <span className="badge badge-muted">Java Edition</span>
-              <span className="badge badge-muted">play.tbnk-smp.com</span>
+              <span className="badge badge-muted">{siteConfig.javaIp}</span>
             </div>
           </div>
 
@@ -155,12 +156,14 @@ export default async function StatusPage() {
               <div className="status-card__title">Boutique</div>
               <Icon name="store" size={22} />
             </div>
-            <div className="status-card__value">{packages.length}</div>
-            <p className="muted small">articles disponibles</p>
+            <div className="status-card__value">{unavailable ? "—" : packages.length}</div>
+            <p className="muted small">
+              {unavailable ? "boutique indisponible" : "articles disponibles"}
+            </p>
             <div className="status-list">
               <div className="status-list__row">
                 <span>Catégories</span>
-                <strong>{categories.length}</strong>
+                <strong>{unavailable ? "—" : categories.length}</strong>
               </div>
               <div className="status-list__row">
                 <span>Paiement</span>
@@ -168,7 +171,7 @@ export default async function StatusPage() {
               </div>
               <div className="status-list__row">
                 <span>Devise</span>
-                <strong>CAD</strong>
+                <strong>{webstore.currency || siteConfig.currency}</strong>
               </div>
               <div className="status-list__row">
                 <span>Livraison</span>

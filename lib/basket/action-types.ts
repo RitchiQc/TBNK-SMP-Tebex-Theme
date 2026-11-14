@@ -10,14 +10,14 @@ export type BasketActionResult =
 export type LoginState = { error: string } | null;
 
 export type PendingAdd = {
-  packageId: number;
+  packageId: number | string;
   quantity: number;
   variableData?: Record<string, string>;
   returnPath: string;
 };
 
 export type AddToBasketInput = {
-  packageId: number;
+  packageId: number | string;
   quantity: number;
   variableData?: Record<string, string>;
   returnPath: string;

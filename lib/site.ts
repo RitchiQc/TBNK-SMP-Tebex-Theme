@@ -1,6 +1,35 @@
-const rawSiteUrl =
-  process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ||
-  "http://localhost:3000";
+function normalizeSiteUrl(value: string | undefined): string {
+  const candidate = value?.trim().replace(/\/+$/, "");
+  if (!candidate) {
+    return "http://localhost:3000";
+  }
+
+  try {
+    const url = new URL(candidate);
+    if (url.protocol !== "http:" && url.protocol !== "https:") {
+      throw new Error("unsupported protocol");
+    }
+    return candidate;
+  } catch {
+    if (typeof window === "undefined") {
+      console.error(`[site] NEXT_PUBLIC_SITE_URL invalide : ${candidate}`);
+    }
+    return "http://localhost:3000";
+  }
+}
+
+const rawSiteUrl = normalizeSiteUrl(process.env.NEXT_PUBLIC_SITE_URL);
+
+if (
+  typeof window === "undefined" &&
+  process.env.NODE_ENV === "production" &&
+  process.env.NEXT_PHASE !== "phase-production-build" &&
+  rawSiteUrl.includes("localhost")
+) {
+  console.error(
+    "[site] NEXT_PUBLIC_SITE_URL doit être configurée avec le domaine public en production."
+  );
+}
 
 export const siteConfig = {
   name: "TBNK-SMP",

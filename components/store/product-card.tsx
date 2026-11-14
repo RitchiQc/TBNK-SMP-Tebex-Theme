@@ -38,7 +38,7 @@ export function ProductCard({
   function addToBasket() {
     startTransition(async () => {
       const result = await addToBasketAction({
-        packageId: pkg.id,
+        packageId: pkg.ident,
         quantity: isSubscription || pkg.disableQuantity ? 1 : quantity,
         returnPath
       });

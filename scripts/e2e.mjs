@@ -1,8 +1,15 @@
 import { chromium } from "playwright-core";
 
+const BASE_URL = process.env.BASE_URL ?? "http://localhost:3000";
+const executablePath =
+  process.env.BROWSER_PATH ??
+  process.env.EDGE_PATH ??
+  (process.platform === "win32"
+    ? "C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe"
+    : undefined);
+
 const browser = await chromium.launch({
-  executablePath:
-    "C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe",
+  ...(executablePath ? { executablePath } : {}),
   headless: true
 });
 const context = await browser.newContext({
@@ -19,7 +26,7 @@ page.on("pageerror", (error) => errors.push(error.message));
 const checks = {};
 
 try {
-  await page.goto("http://localhost:3000/store/cles-coffres", {
+  await page.goto(`${BASE_URL}/store/cles-coffres`, {
     waitUntil: "networkidle"
   });
 
@@ -37,7 +44,7 @@ try {
     .textContent()
     .catch(() => null);
 
-  await page.goto("http://localhost:3000/cart", {
+  await page.goto(`${BASE_URL}/cart`, {
     waitUntil: "networkidle"
   });
   await page.waitForTimeout(400);

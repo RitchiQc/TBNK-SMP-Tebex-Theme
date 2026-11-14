@@ -23,7 +23,7 @@ export async function generateMetadata({
   const page = getLegalPage(slug);
 
   if (!page) {
-    return { title: "Page introuvable" };
+    notFound();
   }
 
   return {

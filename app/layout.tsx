@@ -1,6 +1,5 @@
 import type { Metadata, Viewport } from "next";
 import { Montserrat, Pixelify_Sans } from "next/font/google";
-import Script from "next/script";
 import { SiteFooter } from "@/components/layout/footer";
 import { SiteHeader } from "@/components/layout/header";
 import { ToastProvider } from "@/components/ui/toast";
@@ -92,10 +91,6 @@ export default function RootLayout({
             <SiteFooter />
           </div>
         </ToastProvider>
-        <Script
-          src="https://js.tebex.io/v/1.js"
-          strategy="afterInteractive"
-        />
       </body>
     </html>
   );

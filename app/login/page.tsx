@@ -5,12 +5,12 @@ import { Icon } from "@/components/ui/icons";
 import { PlayerAvatar } from "@/components/ui/player-avatar";
 import { logoutAction } from "@/lib/basket/actions";
 import {
-  getCurrentBasket,
+  getCurrentBasketSafe,
   getEffectiveUsername
 } from "@/lib/basket/session";
 import { safeRedirectPath } from "@/lib/format";
 import { siteConfig } from "@/lib/site";
-import { getStoreData } from "@/lib/tebex/store";
+import { getStoreDataSafe } from "@/lib/tebex/store";
 
 export const metadata: Metadata = {
   title: "Connexion",
@@ -26,8 +26,8 @@ export default async function LoginPage({
 }) {
   const [username, basket, { isMock }, params] = await Promise.all([
     getEffectiveUsername(),
-    getCurrentBasket(),
-    getStoreData(),
+    getCurrentBasketSafe(),
+    getStoreDataSafe(),
     searchParams
   ]);
 

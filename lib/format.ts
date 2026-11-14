@@ -12,23 +12,27 @@ export function formatCurrency(
   currency: string = siteConfig.currency
 ): string {
   const safeAmount = Number.isFinite(amount) ? amount : 0;
+  const code = currency.trim().toUpperCase() || siteConfig.currency;
   const formatted = new Intl.NumberFormat("fr-CA", {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2
   }).format(safeAmount);
 
-  if (currency === "CAD") {
+  if (code === "CAD") {
     return `CA$${formatted}`;
   }
 
-  const symbol = currencySymbols[currency];
+  const symbol = Object.hasOwn(currencySymbols, code)
+    ? currencySymbols[code]
+    : undefined;
+
   if (symbol) {
-    return currency === "EUR" || currency === "GBP"
+    return code === "EUR" || code === "GBP"
       ? `${formatted} ${symbol}`
       : `${symbol}${formatted}`;
   }
 
-  return `${formatted} ${currency}`;
+  return `${formatted} ${code}`;
 }
 
 export function formatNumber(value: number): string {
@@ -87,11 +91,45 @@ export function initials(name: string | null | undefined): string {
     .join("");
 }
 
-export function safeRedirectPath(value: string | null | undefined): string {
-  if (!value || !value.startsWith("/") || value.startsWith("//")) {
+const REDIRECT_ORIGIN = "https://internal.invalid";
+
+/**
+ * Valide un chemin de redirection interne.
+ *
+ * Un simple test `startsWith("//")` ne suffit pas : le parseur d'URL
+ * normalise `\` en `/` pour les schémas http(s), et ignore les tabulations.
+ * `/\evil.com` devient donc `//evil.com`, soit un domaine externe.
+ * On parse donc la valeur avec la même norme que le navigateur, puis on
+ * vérifie que l'origine reste interne.
+ */
+export function safeRedirectPath(value: unknown): string {
+  if (typeof value !== "string" || value.length === 0) {
     return "/";
   }
-  return value;
+
+  if (/[\\\u0000-\u001F\u007F]/.test(value)) {
+    return "/";
+  }
+
+  if (!value.startsWith("/") || value.startsWith("//")) {
+    return "/";
+  }
+
+  try {
+    const url = new URL(value, REDIRECT_ORIGIN);
+    if (url.origin !== REDIRECT_ORIGIN) {
+      return "/";
+    }
+
+    const path = `${url.pathname}${url.search}${url.hash}`;
+    if (!path.startsWith("/") || path.startsWith("//")) {
+      return "/";
+    }
+
+    return path || "/";
+  } catch {
+    return "/";
+  }
 }
 
 export function percentOff(basePrice: number, totalPrice: number): number {

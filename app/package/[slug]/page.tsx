@@ -5,7 +5,7 @@ import { PackageGallery } from "@/components/package/package-gallery";
 import { PackagePurchase } from "@/components/package/package-purchase";
 import { ProductCard } from "@/components/store/product-card";
 import { Icon } from "@/components/ui/icons";
-import { getCurrentBasket } from "@/lib/basket/session";
+import { getCurrentBasketSafe } from "@/lib/basket/session";
 import { stripHtml, truncate } from "@/lib/format";
 import { siteConfig } from "@/lib/site";
 import { getPackageBySlug, getStoreData } from "@/lib/tebex/store";
@@ -21,7 +21,7 @@ export async function generateMetadata({
   const result = await getPackageBySlug(slug);
 
   if (!result) {
-    return { title: "Package introuvable" };
+    notFound();
   }
 
   const { pkg } = result;
@@ -46,7 +46,7 @@ export default async function PackagePage({ params }: PageProps) {
   const [result, { webstore }, basket] = await Promise.all([
     getPackageBySlug(slug),
     getStoreData(),
-    getCurrentBasket()
+    getCurrentBasketSafe()
   ]);
 
   if (!result) {
@@ -83,11 +83,20 @@ export default async function PackagePage({ params }: PageProps) {
     }
   };
 
+  // JSON.stringify n'échappe pas `</script>` : sans cela, un nom de package
+  // contenant cette chaîne peut sortir de la balise JSON-LD.
+  const jsonLdString = JSON.stringify(jsonLd)
+    .replace(/</g, "\\u003c")
+    .replace(/>/g, "\\u003e")
+    .replace(/&/g, "\\u0026")
+    .replace(/\u2028/g, "\\u2028")
+    .replace(/\u2029/g, "\\u2029");
+
   return (
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{ __html: jsonLdString }}
       />
 
       <div className="container-tbnk" style={{ paddingTop: 34 }}>

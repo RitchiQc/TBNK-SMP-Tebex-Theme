@@ -55,7 +55,10 @@ export function MobileMenu({
         onClick={onClose}
         tabIndex={open ? 0 : -1}
       />
-      <div className="mobile-menu__panel">
+      <div
+        className="mobile-menu__panel"
+        {...(!open ? { inert: true } : {})}
+      >
         <div className="mobile-menu__head">
           <Link href="/" className="brand" onClick={onClose}>
             <img className="brand__logo" src={logo} alt={storeName} />

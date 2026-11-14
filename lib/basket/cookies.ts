@@ -1,3 +1,5 @@
+import "server-only";
+
 import { cookies } from "next/headers";
 import type { PendingAdd } from "./action-types";
 
@@ -7,6 +9,7 @@ export const MOCK_BASKET_COOKIE = "tbnk_mock_basket";
 export const PENDING_ADD_COOKIE = "tbnk_pending_add";
 
 const MAX_AGE = 60 * 60 * 24 * 7;
+const USERNAME_PATTERN = /^[A-Za-z0-9_]{3,16}$/;
 
 function cookieOptions() {
   return {
@@ -53,7 +56,7 @@ function decodeJson<T>(value: string | undefined): T | null {
 export async function getUsernameCookie(): Promise<string | null> {
   const store = await cookies();
   const value = store.get(USERNAME_COOKIE)?.value?.trim();
-  return value ? value : null;
+  return value && USERNAME_PATTERN.test(value) ? value : null;
 }
 
 export async function setUsernameCookie(username: string): Promise<void> {

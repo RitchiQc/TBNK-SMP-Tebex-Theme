@@ -19,7 +19,7 @@ export const LEGAL_LINKS = [
 ] as const;
 
 export function getLegalPage(slug: string): LegalPage | null {
-  return LEGAL_PAGES[slug] ?? null;
+  return Object.hasOwn(LEGAL_PAGES, slug) ? LEGAL_PAGES[slug] : null;
 }
 
 export type { LegalPage };

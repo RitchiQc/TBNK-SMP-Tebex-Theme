@@ -1,11 +1,11 @@
 import { getHeaderBasket } from "@/lib/basket/session";
 import { siteConfig } from "@/lib/site";
-import { getStoreData } from "@/lib/tebex/store";
+import { getStoreDataSafe } from "@/lib/tebex/store";
 import { HeaderClient } from "./header-client";
 
 export async function SiteHeader() {
   const [{ webstore, categories, isMock }, header] = await Promise.all([
-    getStoreData(),
+    getStoreDataSafe(),
     getHeaderBasket()
   ]);
 

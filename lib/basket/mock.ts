@@ -1,3 +1,5 @@
+import "server-only";
+
 import { mockPackages } from "@/data/mock";
 import { siteConfig } from "@/lib/site";
 import type { Basket, BasketPackage } from "@/lib/tebex/types";

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect } from "react";
 import { Icon } from "@/components/ui/icons";
+import { siteConfig } from "@/lib/site";
 
 export default function ErrorPage({
   error,
@@ -33,7 +34,7 @@ export default function ErrorPage({
           Accueil
         </Link>
         <a
-          href="https://discord.gg/td98WkM7V5"
+          href={siteConfig.discordUrl}
           target="_blank"
           rel="noopener noreferrer"
           className="btn btn-secondary"

@@ -1,13 +1,17 @@
 "use server";
 
+import "server-only";
+
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { siteConfig } from "@/lib/site";
+import { rateLimit } from "@/lib/rate-limit";
 import {
   getBasketAuthProvidersRaw,
   isMockMode
 } from "@/lib/tebex/client";
 import { mapAuthProviders } from "@/lib/tebex/mapper";
+import { getWebstore } from "@/lib/tebex/store";
 import type { CheckoutResult } from "./action-types";
 import { clearMockBasketCookie } from "./cookies";
 import { getCurrentBasket } from "./session";
@@ -17,7 +21,22 @@ export async function prepareCheckoutAction(): Promise<CheckoutResult> {
     return { mode: "demo" };
   }
 
+  if (!(await rateLimit("basket:checkout", 10, 60_000))) {
+    return {
+      mode: "error",
+      error: "Trop de tentatives. Réessaie dans une minute."
+    };
+  }
+
   try {
+    const webstore = await getWebstore();
+    if (webstore.disabled) {
+      return {
+        mode: "error",
+        error: "La boutique est temporairement fermée."
+      };
+    }
+
     const basket = await getCurrentBasket();
 
     if (!basket || basket.packages.length === 0) {

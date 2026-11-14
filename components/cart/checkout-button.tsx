@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import {
   clearDemoBasketAction,
   prepareCheckoutAction
@@ -8,6 +8,15 @@ import {
 import { siteConfig } from "@/lib/site";
 import { Icon } from "@/components/ui/icons";
 import { useToast } from "@/components/ui/toast";
+
+function isSafeCheckoutUrl(value: string | null): value is string {
+  if (!value) return false;
+  try {
+    return new URL(value).protocol === "https:";
+  } catch {
+    return false;
+  }
+}
 
 export function CheckoutButton({
   disabled,
@@ -20,6 +29,15 @@ export function CheckoutButton({
   const [demoOpen, setDemoOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
 
+  useEffect(() => {
+    if (!demoOpen) return;
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setDemoOpen(false);
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [demoOpen]);
+
   function checkout() {
     startTransition(async () => {
       const result = await prepareCheckoutAction();
@@ -30,6 +48,12 @@ export function CheckoutButton({
       }
 
       if (result.mode === "auth") {
+        if (!isSafeCheckoutUrl(result.url)) {
+          toast("Lien d'authentification Tebex invalide.", {
+            variant: "error"
+          });
+          return;
+        }
         window.location.href = result.url;
         return;
       }
@@ -49,10 +73,13 @@ export function CheckoutButton({
           }
         }
 
-        if (result.url) {
+        if (isSafeCheckoutUrl(result.url)) {
           window.location.href = result.url;
           return;
         }
+
+        toast("Lien de paiement Tebex invalide.", { variant: "error" });
+        return;
       }
 
       if (result.mode === "error") {

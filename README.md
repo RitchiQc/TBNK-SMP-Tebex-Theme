@@ -301,6 +301,7 @@ Le **private key** Tebex n’est jamais utilisé. Seul le public token, prévu p
 | `npm run start` | Serveur de production |
 | `npm run typecheck` | Vérification TypeScript |
 | `npm run test:e2e` | Parcours panier/coupon/checkout en mode démo |
+| `npm run test:security` | Vérifie les 404, les redirections `next`/pending et le vidage du panier après checkout |
 | `npm run screenshots` | Captures desktop/mobile avec Edge |
 | `npm run validate` | Vérifie les fichiers, assets et secrets |
 
@@ -327,9 +328,10 @@ Si Edge n’est pas au chemin par défaut, définis `EDGE_PATH`.
 1. `npm run typecheck`
 2. `npm run build`
 3. `npm run test:e2e`
-4. `npm run screenshots`
-5. Vérifier les captures desktop et mobile.
-6. Avec un token Tebex réel :
+4. `npm run test:security`
+5. `npm run screenshots`
+6. Vérifier les captures desktop et mobile.
+7. Avec un token Tebex réel :
    - le catalogue se charge ;
    - l’ajout au panier fonctionne avec un pseudo Minecraft ;
    - le panier persiste ;
@@ -337,12 +339,15 @@ Si Edge n’est pas au chemin par défaut, définis `EDGE_PATH`.
    - un petit achat de test est livré en jeu.
 7. Vérifier les pages légales et le footer Tebex.
 8. Vérifier le domaine et le HTTPS sur Vercel.
-
 ## Sécurité
 
 - Le **public token** Tebex est utilisé côté serveur. Le private key n’est jamais présent dans le code.
 - Les cookies de panier et de pseudo sont `httpOnly`, `sameSite=lax`, et `secure` en production.
-- Les Server Actions valident les quantités, les variables et les chemins de redirection.
+- Les Server Actions valident les quantités, les variables, les identifiants de package et les chemins de redirection. Le cookie `tbnk_pending_add` est revalidé avant usage.
+- Les descriptions Tebex sont nettoyées avec une allowlist (`sanitize-html`) avant rendu, et le JSON-LD est échappé.
+- Les réponses d’erreur Tebex ne sont pas renvoyées telles quelles au client.
+- Des headers de sécurité (CSP minimale, `X-Frame-Options`, `nosniff`, HSTS, `Referrer-Policy`) sont configurés.
+- Le rate limiting fourni est best-effort et local à l’instance ; pour un déploiement multi-instance, ajouter Vercel WAF ou Upstash.
 - Les prix et la disponibilité sont lus depuis Tebex ; le site ne fait pas confiance à un prix envoyé par le client.
 - Les textes légaux et la mention **Tebex merchant of record** sont inclus dans le footer. Ne les supprime pas sans raison légale.
 - Les images de packages et les descriptions viennent de ton tableau de bord Tebex : garde ton compte Tebex sécurisé.
@@ -351,7 +356,8 @@ Si Edge n’est pas au chemin par défaut, définis `EDGE_PATH`.
 
 - **Pas de thème Tebex hébergé** : ce projet est un site autonome. Tebex reste la caisse et le système de livraison.
 - **Pas d’historique de commandes** : l’API publique utilisée ne l’expose pas. Cela nécessiterait l’API privée/Plugin API avec une clé secrète, volontairement exclue.
-- **Pas de multi-devise** : la devise est celle de la boutique Tebex (CAD ici).
+- **404 et streaming** : le `loading.tsx` global a été retiré pour conserver un vrai statut HTTP 404 sur les slugs inconnus (Next renvoie 200 si le streaming a déjà commencé).
+- **Pas de multi-devise** : la devise suit celle de la boutique Tebex (CAD par défaut).
 - **Pas de Bedrock** : le serveur est Java uniquement, conformément à la configuration actuelle.
 - **Statut serveur** : dépend de `mcsrvstat.us` et de la disponibilité publique de `play.tbnk-smp.com`.
 - **Stats Discord** : valeurs approximatives fournies par l’API d’invitation Discord ; un cache de 5 minutes est utilisé.
@@ -372,7 +378,7 @@ Si Edge n’est pas au chemin par défaut, définis `EDGE_PATH`.
 - [ ] Domaine et DNS configurés ; `play.tbnk-smp.com` réservé au serveur.
 - [ ] Achat test effectué et livré.
 - [ ] Pages légales relues.
-- [ ] `npm run build` et `npm run test:e2e` passent.
+- [ ] `npm run build`, `npm run test:e2e` et `npm run test:security` passent.
 - [ ] Captures desktop/mobile vérifiées.
 
 ## Support

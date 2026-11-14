@@ -1,3 +1,5 @@
+import "server-only";
+
 import { siteConfig } from "@/lib/site";
 
 const API_BASE =
@@ -59,7 +61,7 @@ async function request<T>(
     method = "GET",
     body,
     revalidate,
-    notFound = [404]
+    notFound = []
   } = options;
 
   const headers: Record<string, string> = {
@@ -68,7 +70,8 @@ async function request<T>(
 
   const init: RequestInit & { next?: { revalidate: number } } = {
     method,
-    headers
+    headers,
+    signal: AbortSignal.timeout(8000)
   };
 
   if (body !== undefined) {
@@ -108,7 +111,10 @@ async function request<T>(
   try {
     return JSON.parse(text) as T;
   } catch {
-    return null;
+    throw new TebexError(
+      "Tebex a retourné une réponse illisible.",
+      response.status
+    );
   }
 }
 
@@ -117,12 +123,13 @@ async function request<T>(
 /* -------------------------------------------------------------------------- */
 
 export async function getWebstoreRaw(): Promise<unknown | null> {
-  return request(accountUrl("/"), { revalidate: 300 });
+  return request(accountUrl("/"), { revalidate: 300, notFound: [404] });
 }
 
 export async function getCategoriesRaw(): Promise<unknown | null> {
   return request(accountUrl("/categories?includePackages=1"), {
-    revalidate: 300
+    revalidate: 300,
+    notFound: [404]
   });
 }
 
@@ -144,7 +151,7 @@ export async function createBasketRaw(
     method: "POST",
     body: {
       ...(username ? { username } : {}),
-      complete_url: `${siteConfig.url}/?checkout=success`,
+      complete_url: `${siteConfig.url}/api/checkout/success`,
       cancel_url: `${siteConfig.url}/cart`,
       complete_auto_redirect: true
     }
@@ -168,7 +175,8 @@ export async function getBasketAuthProvidersRaw(
       `/baskets/${encodeURIComponent(ident)}/auth?returnUrl=${encodeURIComponent(
         returnUrl
       )}`
-    )
+    ),
+    { notFound: [404] }
   );
 }
 
@@ -179,14 +187,14 @@ export async function getBasketAuthProvidersRaw(
  */
 export async function addPackageRaw(
   ident: string,
-  packageId: number,
+  packageRef: string | number,
   quantity: number,
   variableData?: Record<string, string>
 ): Promise<unknown | null> {
   return request(bareBasketUrl(ident, "/packages"), {
     method: "POST",
     body: {
-      package_id: String(packageId),
+      package_id: String(packageRef),
       quantity,
       ...(variableData && Object.keys(variableData).length > 0
         ? { variable_data: variableData }
@@ -197,11 +205,14 @@ export async function addPackageRaw(
 
 export async function updatePackageQuantityRaw(
   ident: string,
-  packageId: number,
+  packageRef: string | number,
   quantity: number
 ): Promise<unknown | null> {
   return request(
-    bareBasketUrl(ident, `/packages/${encodeURIComponent(String(packageId))}`),
+    bareBasketUrl(
+      ident,
+      `/packages/${encodeURIComponent(String(packageRef))}`
+    ),
     {
       method: "PUT",
       body: { quantity }
@@ -211,11 +222,11 @@ export async function updatePackageQuantityRaw(
 
 export async function removePackageRaw(
   ident: string,
-  packageId: number
+  packageRef: string | number
 ): Promise<unknown | null> {
   return request(bareBasketUrl(ident, "/packages/remove"), {
     method: "POST",
-    body: { package_id: String(packageId) }
+    body: { package_id: String(packageRef) }
   });
 }
 
