@@ -8,9 +8,10 @@ export const terms: LegalPage = {
     "Conditions d’achat et d’utilisation de la boutique et du serveur TBNK-SMP.",
   updated: "14 novembre 2026",
   html: `
-    <h2>1. Identité du commerçant et objet</h2>
+    <h2>1. Exploitant, vendeur et objet</h2>
     ${contactBlock()}
-    <p>Les présentes conditions encadrent l’utilisation du site de la boutique TBNK-SMP et l’achat d’articles numériques pour le serveur Minecraft Java TBNK-SMP. Elles s’appliquent aux consommateurs du Québec et ne limitent pas les droits impératifs prévus par la Loi sur la protection du consommateur (LPC).</p>
+    <p>Le site et le serveur TBNK-SMP sont exploités par TBNK-SMP. Les produits numériques proposés sur la boutique sont vendus par <strong>Tebex</strong>, qui agit comme vendeur et marchand of record. <strong>Le contrat de vente est conclu exclusivement entre le client et Tebex</strong> ; aucun contrat de vente n’est formé entre le client et TBNK-SMP. Tebex gère le paiement, les taxes, les reçus, les remboursements et le support lié à la transaction.</p>
+    <p>Les présentes conditions encadrent l’utilisation du site et du serveur TBNK-SMP ainsi que les règles communautaires. Elles s’appliquent aux consommateurs du Québec et ne limitent pas les droits impératifs prévus par la Loi sur la protection du consommateur (LPC).</p>
     <p>En utilisant le site ou en effectuant un achat, tu acceptes ces conditions. Si tu ne les acceptes pas, tu ne dois pas utiliser la boutique.</p>
 
     <h2>2. Âge et mineurs</h2>
@@ -21,7 +22,7 @@ export const terms: LegalPage = {
     <p>Un pseudo erroné peut empêcher ou retarder la livraison. Contacte le support si tu constates une erreur. Aucun mot de passe Minecraft ne t’est demandé par le site.</p>
 
     <h2>4. Achats, prix et paiements</h2>
-    <p>Les paiements sont traités par <strong>Tebex</strong>, qui agit comme revendeur officiel et marchand of record. Tebex gère la transaction, les taxes applicables, la sécurité du paiement et les remboursements.</p>
+    <p>Les paiements sont traités par <strong>Tebex</strong>, qui agit comme vendeur et marchand of record. Tebex gère la transaction, les taxes applicables, la sécurité du paiement, les reçus et les remboursements. Le contrat de vente est conclu exclusivement avec Tebex.</p>
     <p>Les prix sont affichés en dollars canadiens (CAD). Sauf indication contraire, les taxes applicables sont calculées et affichées sur la page de paiement Tebex avant la confirmation. Le prix total à payer est confirmé sur cette page. Si un prix affiché est erroné, le prix annoncé le plus bas prévaut dans la mesure permise par la LPC.</p>
     <p>TBNK-SMP n’est ni affilié ni sponsorisé par Mojang Studios ou Microsoft.</p>
 
@@ -34,7 +35,7 @@ export const terms: LegalPage = {
 
     <h2>7. Contrat à distance, reçu et annulation</h2>
     <p>Conformément à la LPC, les renseignements essentiels sont fournis avant la conclusion du contrat et le paiement est confirmé sur la page Tebex. Un exemplaire écrit du contrat (reçu Tebex) doit pouvoir être conservé et imprimé. Si tu ne le reçois pas dans les 15 jours, contacte le support : la LPC peut prévoir un délai de résolution supplémentaire.</p>
-    <p>Si le commerçant ne respecte pas certaines obligations prévues par la LPC, tu peux avoir le droit de résoudre le contrat sans frais. Ces droits ne peuvent pas être supprimés par la présente politique. Voir aussi la <a href="/legal/refund">politique de remboursement</a>.</p>
+    <p>Si les obligations prévues par la LPC ne sont pas respectées (renseignements obligatoires, contrat écrit, livraison, etc.), tu peux avoir le droit de résoudre le contrat sans frais. Ces droits ne peuvent pas être supprimés par la présente politique. Voir aussi la <a href="/legal/refund">politique de remboursement</a>.</p>
 
     <h2>8. Règles du serveur</h2>
     <p>L’achat d’un article ne dispense pas du respect des règles du serveur. Un compte banni ou sanctionné peut perdre l’accès à certains avantages, sans que cela ouvre automatiquement droit à un remboursement, sous réserve des droits impératifs applicables.</p>

@@ -9,11 +9,11 @@ export const refund: LegalPage = {
   updated: "14 novembre 2026",
   html: `
     <h2>1. Principe et droits impératifs</h2>
-    <p>Les articles vendus sur la boutique TBNK-SMP sont des biens numériques livrés immédiatement en jeu. En raison de leur nature, ils ne peuvent pas être « retournés » une fois livrés. Cette règle ne limite toutefois pas les droits impératifs prévus par la Loi sur la protection du consommateur (LPC).</p>
-    <p>Les paiements sont traités par <strong>Tebex</strong>, marchand of record. Les demandes de remboursement sont examinées dans le cadre des conditions de Tebex et de la loi applicable.</p>
+    <p>Les articles proposés sur la boutique TBNK-SMP sont vendus par <strong>Tebex</strong>, vendeur et marchand of record. Ce sont des biens numériques livrés immédiatement en jeu. En raison de leur nature, ils ne peuvent pas être « retournés » une fois livrés. Cette règle ne limite toutefois pas les droits impératifs prévus par la Loi sur la protection du consommateur (LPC).</p>
+    <p>Les demandes de remboursement sont traitées par Tebex dans le cadre de ses conditions et de la loi applicable. Le contrat de vente est conclu exclusivement avec Tebex.</p>
 
     <h2>2. Droit de résolution prévu par la LPC</h2>
-    <p>Si le commerçant ne respecte pas certaines obligations prévues par la LPC (renseignements obligatoires, contrat écrit, livraison, etc.), tu peux avoir le droit de résoudre le contrat sans frais. Si un exemplaire écrit du contrat ne t’est pas transmis dans le délai prévu, la LPC peut porter le délai de résolution à 30 jours à compter de la conclusion du contrat. En cas de résolution, le remboursement des sommes payées doit être effectué dans les 15 jours suivant l’annulation, selon la LPC.</p>
+    <p>Si les obligations prévues par la LPC ne sont pas respectées (renseignements obligatoires, contrat écrit, livraison, etc.), tu peux avoir le droit de résoudre le contrat sans frais. Si un exemplaire écrit du contrat ne t’est pas transmis dans le délai prévu, la LPC peut porter le délai de résolution à 30 jours à compter de la conclusion du contrat. En cas de résolution, le remboursement des sommes payées doit être effectué dans les 15 jours suivant l’annulation, selon la LPC.</p>
 
     <h2>3. Cas pouvant donner lieu à un remboursement</h2>
     <ul>
@@ -41,7 +41,7 @@ export const refund: LegalPage = {
       <li>l’identifiant de transaction Tebex ou la référence de commande ;</li>
       <li>une description précise du problème.</li>
     </ul>
-    <p>Nous vérifierons la commande et la livraison avant de transmettre la demande à Tebex si nécessaire.</p>
+    <p>Nous vérifions la livraison en jeu et transmettons la demande à Tebex, qui traite le remboursement. Tu peux aussi contacter directement le <a href="https://www.tebex.io/contact" target="_blank" rel="noopener noreferrer">support Tebex</a>.</p>
 
     <h2>6. Reçu et contrat</h2>
     <p>Le reçu Tebex constitue l’exemplaire écrit du contrat à conserver. S’il ne contient pas les mentions requises ou si tu ne le reçois pas dans les 15 jours, contacte le support afin que nous puissions corriger la situation.</p>

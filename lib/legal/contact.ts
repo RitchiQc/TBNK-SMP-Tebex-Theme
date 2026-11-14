@@ -8,8 +8,9 @@ export const contact: LegalPage = {
     "Contacter le support, le responsable de la confidentialité et le service à la clientèle de TBNK-SMP.",
   updated: "14 novembre 2026",
   html: `
-    <h2>Coordonnées du commerçant</h2>
+    <h2>Exploitant, vendeur et coordonnées</h2>
     ${contactBlock()}
+    <p>Les produits sont vendus par Tebex, vendeur et marchand of record. Le contrat de vente est conclu exclusivement avec Tebex ; TBNK-SMP exploite le site et le serveur et assure la livraison en jeu.</p>
 
     <h2>Support TBNK-SMP</h2>
     <p>Le support officiel se fait par courriel et sur Discord. C’est le moyen le plus rapide pour obtenir de l’aide sur un achat, une livraison ou un problème en jeu.</p>
@@ -26,7 +27,7 @@ export const contact: LegalPage = {
     <p>Dans ton message, indique ton pseudo, la date de l’achat, le nom de l’article et l’identifiant de transaction Tebex.</p>
 
     <h2>Problème de paiement</h2>
-    <p>Les paiements sont traités par Tebex. Pour une question de facturation, de moyen de paiement ou de remboursement, contacte le support Tebex en plus du support TBNK-SMP.</p>
+    <p>Les paiements sont traités par Tebex, vendeur et marchand of record. Pour une question de facturation, de moyen de paiement ou de remboursement, contacte le <a href="https://www.tebex.io/contact" target="_blank" rel="noopener noreferrer">support Tebex</a>.</p>
     <p><a href="https://www.tebex.io" target="_blank" rel="noopener noreferrer">Site officiel Tebex</a></p>
 
     <h2>Confidentialité et droits (Loi 25)</h2>

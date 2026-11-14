@@ -1,5 +1,5 @@
 import type { LegalPage } from "./types";
-import { contactBlock, emailLink, legalIdentity } from "./helpers";
+import { emailLink, legalIdentity, operatorBlock } from "./helpers";
 
 export const privacy: LegalPage = {
   slug: "privacy",
@@ -9,8 +9,9 @@ export const privacy: LegalPage = {
   updated: "14 novembre 2026",
   html: `
     <h2>1. Responsable de la protection des renseignements personnels</h2>
-    ${contactBlock()}
+    ${operatorBlock()}
     <p>Le responsable veille au respect de la Loi sur la protection des renseignements personnels dans le secteur privé (Loi 25). Tu peux le joindre pour toute question, demande d’accès ou plainte.</p>
+    <p>TBNK-SMP est responsable des renseignements collectés par le site. Les renseignements de paiement sont traités par Tebex, vendeur et marchand of record.</p>
     <p>Tu peux également porter plainte auprès de la <a href="https://www.cai.gouv.qc.ca" target="_blank" rel="noopener noreferrer">Commission d’accès à l’information du Québec (CAI)</a>.</p>
 
     <h2>2. Données collectées</h2>

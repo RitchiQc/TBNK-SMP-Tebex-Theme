@@ -93,7 +93,8 @@ NEXT_PUBLIC_SITE_URL="http://localhost:3000"
 - `NEXT_PUBLIC_SITE_URL` : URL publique du site, sans slash final. En production : `https://tbnk-smp.com`.
 - `APP_ENV` : `development`, `preview` ou `production`. Sur Vercel, `VERCEL_ENV` est utilisé si `APP_ENV` est absent.
 - `COOKIE_SECRET` : secret de signature des cookies, **obligatoire en production** (32 caractères minimum). Génère-le avec `openssl rand -base64 48`.
-- `NEXT_PUBLIC_LEGAL_*`, `NEXT_PUBLIC_SUPPORT_EMAIL`, `NEXT_PUBLIC_PRIVACY_EMAIL`, `NEXT_PUBLIC_PRIVACY_OFFICER` : identité légale et contacts **obligatoires en production** pour la LPC et la Loi 25. `NEXT_PUBLIC_PRIVACY_OFFICER` attend le **titre/fonction** du responsable (le nom personnel n'est pas requis).
+- `NEXT_PUBLIC_SUPPORT_EMAIL`, `NEXT_PUBLIC_PRIVACY_EMAIL`, `NEXT_PUBLIC_PRIVACY_OFFICER` : contacts **obligatoires en production** pour la Loi 25. `NEXT_PUBLIC_PRIVACY_OFFICER` attend le **titre/fonction** du responsable (le nom personnel n'est pas requis).
+- `NEXT_PUBLIC_LEGAL_*` : **facultatif** — identité d'entreprise (nom, adresse, téléphone) à afficher si TBNK-SMP est le vendeur. Par défaut, le vendeur des produits est **Tebex** (marchand of record) : ces champs ne sont pas nécessaires.
 - `NEXT_PUBLIC_PRICES_INCLUDE_TAXES` : `true` si les prix Tebex incluent déjà les taxes, sinon `false`.
 
 ### Environnements et mode démo
@@ -106,7 +107,7 @@ NEXT_PUBLIC_SITE_URL="http://localhost:3000"
 
 Règles importantes :
 
-- En production, le build/startup **échoue** si `TEBEX_PUBLIC_TOKEN`, `NEXT_PUBLIC_SITE_URL`, `COOKIE_SECRET` ou les mentions légales obligatoires manquent.
+- En production, le build/startup **échoue** si `TEBEX_PUBLIC_TOKEN`, `NEXT_PUBLIC_SITE_URL`, `COOKIE_SECRET` ou les contacts de confidentialité obligatoires manquent.
 - `ALLOW_DEMO=true` est ignoré/interdit en production.
 - En preview Vercel sans token, la démo est active automatiquement ; le site est `noindex` et un bandeau « Démo/Préproduction » est affiché.
 - Ne jamais utiliser le token Tebex de production dans une preview : utilise une boutique/token de test séparé.
@@ -119,13 +120,15 @@ Avant une ouverture publique au Québec :
 - désigner un **responsable de la protection des renseignements personnels** et publier son **titre et ses coordonnées** (art. 3.1 P-39.1 : le nom personnel n'est pas exigé) ;
 - compléter la politique de confidentialité (finalités, droits, témoins, tiers, transferts hors Québec, incidents, mineurs de moins de 14 ans, plainte CAI) ;
 - recueillir un **consentement explicite** pour les témoins non nécessaires (YouTube, avatars mc-heads) et permettre le retrait à tout moment ;
-- fournir l’identité, l’adresse, le téléphone et le courriel du commerçant avant l’achat ;
+- afficher clairement que **Tebex est le vendeur et marchand of record** (le contrat de vente est conclu exclusivement avec Tebex) et fournir ses conditions/coordonnées avant l’achat ; si TBNK-SMP est le vendeur, renseigner `NEXT_PUBLIC_LEGAL_*` ;
 - afficher clairement les taxes et le total avant paiement ;
 - vérifier que Tebex envoie un **reçu/contrat en français** dans les 15 jours et que le checkout est en français ;
 - faire valider les conditions et la politique de remboursement par un juriste québécois ;
 - conserver une politique interne de gouvernance, un registre des incidents et une EFVP pour les transferts hors Québec.
 
-Le site affiche un avertissement en développement/préproduction si les champs légaux sont incomplets. Un build de production échoue tant qu’ils ne sont pas renseignés.
+Le site présente Tebex comme vendeur des produits et TBNK-SMP comme exploitant du site et du serveur. Les champs `NEXT_PUBLIC_LEGAL_*` ne sont donc pas requis par défaut ; ils restent disponibles si l’exploitant doit être identifié comme commerçant.
+
+Le site affiche un avertissement en développement/préproduction si les contacts de confidentialité sont incomplets. Un build de production échoue tant qu’ils ne sont pas renseignés.
 
 Après avoir ajouté le token, redémarre le serveur. Le badge “Démo” disparaît et les produits viennent de ta boutique Tebex.
 

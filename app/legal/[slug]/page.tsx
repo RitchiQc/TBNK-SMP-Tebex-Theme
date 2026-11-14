@@ -42,10 +42,7 @@ export default async function LegalPage({ params }: PageProps) {
     notFound();
   }
 
-  const legalIncomplete =
-    !siteConfig.legalName ||
-    !siteConfig.legalAddress ||
-    !siteConfig.legalPhone ||
+  const contactIncomplete =
     !siteConfig.supportEmail ||
     !siteConfig.privacyEmail ||
     !siteConfig.privacyOfficer;
@@ -83,15 +80,16 @@ export default async function LegalPage({ params }: PageProps) {
           </nav>
 
           <div>
-            {legalIncomplete && appEnv !== "production" ? (
+            {contactIncomplete && appEnv !== "production" ? (
               <div className="cart-login-banner" style={{ marginBottom: 16 }}>
                 <p>
-                  <b>Mentions légales à compléter.</b> Renseigne{" "}
-                  <code>NEXT_PUBLIC_LEGAL_*</code>,{" "}
+                  <b>Coordonnées de confidentialité à compléter.</b> Renseigne{" "}
                   <code>NEXT_PUBLIC_SUPPORT_EMAIL</code>,{" "}
                   <code>NEXT_PUBLIC_PRIVACY_EMAIL</code> et{" "}
                   <code>NEXT_PUBLIC_PRIVACY_OFFICER</code> avant la mise en
-                  production. Le build de production échoue si ces champs
+                  production. Les champs <code>NEXT_PUBLIC_LEGAL_*</code> sont
+                  facultatifs (identité d’entreprise si TBNK-SMP est le vendeur).
+                  Le build de production échoue si les contacts obligatoires
                   manquent.
                 </p>
               </div>

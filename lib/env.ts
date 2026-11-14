@@ -52,19 +52,19 @@ if (isProduction) {
     );
   }
 
-  const requiredLegalFields: Array<[string, string]> = [
-    ["NEXT_PUBLIC_LEGAL_NAME", process.env.NEXT_PUBLIC_LEGAL_NAME ?? ""],
-    ["NEXT_PUBLIC_LEGAL_ADDRESS", process.env.NEXT_PUBLIC_LEGAL_ADDRESS ?? ""],
-    ["NEXT_PUBLIC_LEGAL_PHONE", process.env.NEXT_PUBLIC_LEGAL_PHONE ?? ""],
+  // Les champs NEXT_PUBLIC_LEGAL_* sont facultatifs : par défaut, le vendeur
+  // des produits est Tebex (marchand of record). Voir
+  // docs/legal/checklist-quebec.md.
+  const requiredContactFields: Array<[string, string]> = [
     ["NEXT_PUBLIC_SUPPORT_EMAIL", process.env.NEXT_PUBLIC_SUPPORT_EMAIL ?? ""],
     ["NEXT_PUBLIC_PRIVACY_EMAIL", process.env.NEXT_PUBLIC_PRIVACY_EMAIL ?? ""],
     ["NEXT_PUBLIC_PRIVACY_OFFICER", process.env.NEXT_PUBLIC_PRIVACY_OFFICER ?? ""]
   ];
 
-  for (const [key, value] of requiredLegalFields) {
+  for (const [key, value] of requiredContactFields) {
     if (!value.trim()) {
       errors.push(
-        `${key} est obligatoire en production (identité légale et contacts Loi 25 / LPC).`
+        `${key} est obligatoire en production (contacts de confidentialité Loi 25).`
       );
     }
   }

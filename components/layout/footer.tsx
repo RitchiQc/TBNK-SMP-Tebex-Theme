@@ -51,11 +51,12 @@ export async function SiteFooter() {
             </div>
 
             <div className="footer-legal-identity">
-              <strong>{siteConfig.legalName || "Identité légale à compléter"}</strong>
-              <span>{siteConfig.legalAddress || "Adresse à compléter"}</span>
+              <strong>{siteConfig.legalName || siteConfig.name}</strong>
+              {siteConfig.legalAddress ? (
+                <span>{siteConfig.legalAddress}</span>
+              ) : null}
               <span>
-                {siteConfig.legalPhone || "Téléphone à compléter"}
-                {" · "}
+                {siteConfig.legalPhone ? `${siteConfig.legalPhone} · ` : ""}
                 {siteConfig.supportEmail ? (
                   <a href={`mailto:${siteConfig.supportEmail}`}>
                     {siteConfig.supportEmail}
@@ -63,6 +64,18 @@ export async function SiteFooter() {
                 ) : (
                   "Courriel à compléter"
                 )}
+              </span>
+              <span>Exploitant du site et du serveur Minecraft</span>
+              <span>
+                Ventes conclues avec{" "}
+                <a
+                  href="https://www.tebex.io"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Tebex
+                </a>
+                , vendeur et marchand of record.
               </span>
               <span>
                 Confidentialité :{" "}
@@ -133,10 +146,11 @@ export async function SiteFooter() {
         </div>
 
         <p className="tebex-disclosure">
-          Les paiements sont traités par <strong>Tebex</strong>, revendeur
-          officiel et marchand of record. TBNK-SMP n’est ni affilié ni sponsorisé
-          par Mojang Studios ou Microsoft. Les articles numériques sont livrés
-          sur le compte Minecraft renseigné lors du paiement. Consulte les{" "}
+          Les ventes et paiements sont traités par <strong>Tebex</strong>,
+          vendeur officiel et marchand of record. Le contrat de vente est conclu
+          avec Tebex. TBNK-SMP n’est ni affilié ni sponsorisé par Mojang Studios
+          ou Microsoft. Les articles numériques sont livrés sur le compte
+          Minecraft renseigné lors du paiement. Consulte les{" "}
           <Link href="/legal/terms">conditions</Link> et la{" "}
           <Link href="/legal/refund">politique de remboursement</Link> avant tout
           achat.
