@@ -70,6 +70,10 @@ Sources :
 - [ ] Reçu en français avec toutes les mentions obligatoires.
 - [ ] Droit de résolution expliqué ; remboursement dans les 15 jours si applicable.
 - [ ] Conditions et politique de remboursement validées par un juriste.
+- [ ] Politique de remboursement Tebex réglée sur **« No Refunds »** (ventes
+      finales ; exceptions Tebex : produit non livré ou problème technique), car
+      les articles sont livrés instantanément en jeu. La page `/legal/refund`
+      doit rester alignée sur ce choix.
 - [ ] Moyens de paiement affichés uniquement s'ils sont réellement offerts par Tebex.
 
 Sources :
@@ -132,6 +136,8 @@ Sources :
       conditions sont affichés avant le paiement.
 - [ ] Vérifier la gestion TPS/TVQ avec Tebex et un comptable.
 - [ ] Configurer la langue française du checkout et des reçus.
+- [ ] Vérifier que la politique de remboursement affichée au checkout Tebex
+      correspond à celle de `/legal/refund` (No Refunds, avec les exceptions).
 - [ ] Vérifier que le reçu contient : identité, adresse, date, description,
       prix, taxes, total, coordonnées et mentions d'annulation.
 - [ ] Tester un achat réel et la livraison en jeu.
