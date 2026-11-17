@@ -46,7 +46,7 @@ export const privacy: LegalPage = {
       <li><strong>Consentement</strong> — <code>tbnk_consent</code> : mémorise tes choix, 6 mois, SameSite=Lax.</li>
       <li><strong>Tebex.js</strong> — chargé uniquement lorsque tu cliques sur « Passer au paiement ». Tebex peut déposer ses propres témoins pour le paiement ; consulte la <a href="https://www.tebex.io/privacy" target="_blank" rel="noopener noreferrer">politique de Tebex</a>.</li>
       <li><strong>YouTube</strong> — une vidéo n’est chargée qu’après ton action ou ton consentement, via <code>youtube-nocookie.com</code>. Consulte la <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer">politique de Google</a>.</li>
-      <li><strong>Avatars Minecraft</strong> — récupérés côté serveur depuis <code>mc-heads.net</code> et mis en cache ; ton navigateur ne contacte jamais mc-heads directement.</li>
+      <li><strong>Avatars Minecraft</strong> — le pseudo est résolu en UUID via l’API Mojang/Microsoft, puis l’image est récupérée côté serveur depuis <code>minotar.net</code> (fallback <code>mc-heads.net</code>) et mise en cache ; ton navigateur ne contacte jamais ces services directement.</li>
     </ul>
     <p>Aucun outil de mesure d’audience ou de publicité n’est utilisé à ce jour. S’il est ajouté, il sera soumis au consentement préalable.</p>
 
@@ -55,7 +55,8 @@ export const privacy: LegalPage = {
     <ul>
       <li><strong>Tebex</strong> — paiement, taxes, remboursements et livraison ;</li>
       <li><strong>Discord</strong> — communauté et support, si tu rejoins le serveur ;</li>
-      <li><strong>mc-heads.net</strong> — avatars Minecraft récupérés côté serveur et mis en cache (aucune requête directe de ton navigateur) ;</li>
+      <li><strong>Mojang/Microsoft</strong> — résolution du pseudo Minecraft en UUID pour charger l’avatar ;</li>
+      <li><strong>minotar.net et mc-heads.net</strong> — avatars Minecraft récupérés côté serveur et mis en cache (aucune requête directe de ton navigateur) ;</li>
       <li><strong>mcsrvstat.us</strong> — statut public du serveur ;</li>
       <li><strong>YouTube/Google</strong> — vidéos, avec consentement.</li>
     </ul>

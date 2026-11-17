@@ -9,6 +9,16 @@ const AVATAR_TIMEOUT_MS = 4000;
 const CACHE_SECONDS = 60 * 60 * 24;
 const STALE_SECONDS = 60 * 60 * 24 * 7;
 
+const PROFILE_LOOKUPS = [
+  "https://api.minecraftservices.com/minecraft/profile/lookup/name",
+  "https://api.mojang.com/users/profiles/minecraft"
+];
+
+type MinecraftProfile = {
+  id: string;
+  name: string;
+};
+
 function parseSize(value: string | null): number | null {
   if (!value) return DEFAULT_SIZE;
 
@@ -18,6 +28,39 @@ function parseSize(value: string | null): number | null {
   }
 
   return size;
+}
+
+async function resolveProfile(
+  username: string
+): Promise<MinecraftProfile | null> {
+  for (const base of PROFILE_LOOKUPS) {
+    try {
+      const response = await fetch(`${base}/${encodeURIComponent(username)}`, {
+        next: { revalidate: CACHE_SECONDS },
+        signal: AbortSignal.timeout(AVATAR_TIMEOUT_MS)
+      });
+
+      if (response.status === 404 || response.status === 204) {
+        continue;
+      }
+
+      if (!response.ok) continue;
+
+      const data = (await response.json()) as Record<string, unknown>;
+      if (typeof data.id !== "string" || typeof data.name !== "string") {
+        continue;
+      }
+
+      const id = data.id.replace(/-/g, "").toLowerCase();
+      if (!/^[0-9a-f]{32}$/.test(id)) continue;
+
+      return { id, name: data.name };
+    } catch {
+      // Essaie l'API suivante.
+    }
+  }
+
+  return null;
 }
 
 async function fetchAvatar(url: string): Promise<Response | null> {
@@ -43,9 +86,11 @@ async function fetchAvatar(url: string): Promise<Response | null> {
 /**
  * Proxy first-party des avatars Minecraft.
  *
- * Le navigateur ne contacte jamais mc-heads.net : l'image est récupérée et
- * mise en cache côté serveur. Cela évite les requêtes tierces côté visiteur,
- * les blocages CSP/adblock et les limites de débit du fournisseur.
+ * Le pseudo est d'abord résolu en UUID via les API Mojang/Microsoft, puis
+ * l'image est récupérée côté serveur. Minotar est utilisé en priorité avec
+ * l'UUID : son cache par pseudo est sensible à la casse et peut renvoyer une
+ * tête Steve pour un pseudo valide. Les comptes inexistants renvoient 404 afin
+ * que le client affiche les initiales plutôt qu'un faux avatar.
  */
 export async function GET(
   request: Request,
@@ -72,27 +117,50 @@ export async function GET(
     );
   }
 
-  const encoded = encodeURIComponent(username);
-  const upstream =
-    (await fetchAvatar(`https://mc-heads.net/avatar/${encoded}/${size}`)) ??
-    (await fetchAvatar(`https://minotar.net/helm/${encoded}/${size}.png`));
-
-  if (!upstream) {
+  const profile = await resolveProfile(username);
+  if (!profile) {
     return NextResponse.json(
-      { error: "Avatar indisponible." },
+      { error: "Compte Minecraft introuvable." },
       { status: 404 }
     );
   }
 
-  const body = await upstream.arrayBuffer();
-  const contentType = upstream.headers.get("content-type") ?? "image/png";
-
-  return new NextResponse(body, {
-    status: 200,
-    headers: {
-      "Content-Type": contentType,
-      "Cache-Control": `public, max-age=${CACHE_SECONDS}, stale-while-revalidate=${STALE_SECONDS}`,
-      "X-Content-Type-Options": "nosniff"
+  const candidates = [
+    {
+      source: "minotar-uuid",
+      url: `https://minotar.net/helm/${profile.id}/${size}.png`
+    },
+    {
+      source: "mc-heads-uuid",
+      url: `https://mc-heads.net/avatar/${profile.id}/${size}`
+    },
+    {
+      source: "mc-heads-name",
+      url: `https://mc-heads.net/avatar/${encodeURIComponent(profile.name)}/${size}`
     }
-  });
+  ];
+
+  for (const candidate of candidates) {
+    const upstream = await fetchAvatar(candidate.url);
+    if (!upstream) continue;
+
+    const body = await upstream.arrayBuffer();
+    const contentType = upstream.headers.get("content-type") ?? "image/png";
+
+    return new NextResponse(body, {
+      status: 200,
+      headers: {
+        "Content-Type": contentType,
+        "Cache-Control": `public, max-age=${CACHE_SECONDS}, stale-while-revalidate=${STALE_SECONDS}`,
+        "X-Content-Type-Options": "nosniff",
+        "X-Avatar-Source": candidate.source
+      }
+    });
+  }
+
+  return NextResponse.json(
+    { error: "Avatar indisponible." },
+    { status: 404 }
+  );
 }
+

@@ -34,6 +34,19 @@ function cookieOptions() {
   };
 }
 
+function expiredCookieOptions() {
+  return {
+    ...cookieOptions(),
+    maxAge: 0,
+    expires: new Date(0)
+  };
+}
+
+async function clearCookie(name: string): Promise<void> {
+  const store = await cookies();
+  store.set(name, "", expiredCookieOptions());
+}
+
 function sign(value: string): string {
   const signature = createHmac("sha256", cookieSecret)
     .update(value)
@@ -175,8 +188,7 @@ export async function setUsernameCookie(username: string): Promise<void> {
 }
 
 export async function clearUsernameCookie(): Promise<void> {
-  const store = await cookies();
-  store.delete(USERNAME_COOKIE);
+  await clearCookie(USERNAME_COOKIE);
 }
 
 export async function getBasketIdentCookie(): Promise<string | null> {
@@ -195,8 +207,7 @@ export async function setBasketIdentCookie(ident: string): Promise<void> {
 }
 
 export async function clearBasketIdentCookie(): Promise<void> {
-  const store = await cookies();
-  store.delete(BASKET_COOKIE);
+  await clearCookie(BASKET_COOKIE);
 }
 
 export async function getMockBasketCookie(): Promise<string | null> {
@@ -216,8 +227,7 @@ export async function setMockBasketCookie(value: string): Promise<void> {
 }
 
 export async function clearMockBasketCookie(): Promise<void> {
-  const store = await cookies();
-  store.delete(MOCK_BASKET_COOKIE);
+  await clearCookie(MOCK_BASKET_COOKIE);
 }
 
 export async function getPendingAddCookie(): Promise<PendingAdd | null> {
@@ -244,6 +254,5 @@ export async function setPendingAddCookie(
 }
 
 export async function clearPendingAddCookie(): Promise<void> {
-  const store = await cookies();
-  store.delete(PENDING_ADD_COOKIE);
+  await clearCookie(PENDING_ADD_COOKIE);
 }

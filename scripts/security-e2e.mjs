@@ -41,6 +41,24 @@ await checkStatus("/legal/__proto__", 404);
 await checkStatus("/legal/constructor", 404);
 await checkStatus("/package/%25E0%25A4%25A", 404);
 await checkStatus("/login?next=a&next=b", 200);
+await checkStatus("/api/avatar/NotARealPlayer42?size=144&v=2", 404);
+
+const avatarResponse = await fetch(
+  `${BASE_URL}/api/avatar/Notch?size=144&v=2`
+);
+results["/api/avatar/Notch?size=144&v=2"] = avatarResponse.status;
+if (avatarResponse.status !== 200) {
+  failures.push(
+    `/api/avatar/Notch: attendu 200, reçu ${avatarResponse.status}`
+  );
+}
+const avatarSource = avatarResponse.headers.get("x-avatar-source") ?? "";
+results.avatarSource = avatarSource;
+if (!avatarSource.includes("uuid")) {
+  failures.push(
+    `Avatar Notch sans source UUID (${avatarSource || "absente"}).`
+  );
+}
 
 const homeResponse = await fetch(`${BASE_URL}/`);
 const homeCsp = homeResponse.headers.get("content-security-policy") ?? "";
@@ -98,7 +116,7 @@ try {
   await loginPage.goto(`${BASE_URL}/login?next=/%5Cevil.com`, {
     waitUntil: "networkidle"
   });
-  await loginPage.locator("#username").fill("Alex_13241");
+  await loginPage.locator("#username").fill("Notch");
   await loginPage.getByRole("button", { name: "Continuer" }).click();
   await loginPage.waitForTimeout(1600);
 
@@ -151,9 +169,35 @@ try {
       headers: { cookie: cookieHeader }
     })
   ).text();
-  results.loginAvatarInSsr = loginHtml.includes("/api/avatar/Alex_13241");
+  results.loginAvatarInSsr = loginHtml.includes("/api/avatar/Notch");
   if (!results.loginAvatarInSsr) {
     failures.push("L'avatar n'est pas rendu côté serveur sur /login.");
+  }
+
+  await loginPage.getByRole("button", { name: "Se déconnecter" }).click();
+  await loginPage.waitForTimeout(1200);
+  await loginPage.goto(`${BASE_URL}/login`, { waitUntil: "networkidle" });
+
+  const logoutShowsLoginForm = await loginPage
+    .locator("#username")
+    .isVisible()
+    .catch(() => false);
+  results.logoutShowsLoginForm = logoutShowsLoginForm;
+  if (!logoutShowsLoginForm) {
+    failures.push(
+      "Après déconnexion, le formulaire de connexion ne s'affiche pas."
+    );
+  }
+
+  const cookiesAfterLogout = await loginContext.cookies();
+  const sessionCookieLeft = cookiesAfterLogout.some((cookie) =>
+    /tbnk_(username|basket_ident|mock_basket|pending_add)$/.test(cookie.name)
+  );
+  results.logoutClearedCookies = !sessionCookieLeft;
+  if (sessionCookieLeft) {
+    failures.push(
+      "Les cookies de session ne sont pas supprimés après déconnexion."
+    );
   }
 
   await loginContext.close();
@@ -180,7 +224,7 @@ try {
   ]);
   const pendingPage = await pendingContext.newPage();
   await pendingPage.goto(`${BASE_URL}/login`, { waitUntil: "networkidle" });
-  await pendingPage.locator("#username").fill("Alex_13241");
+  await pendingPage.locator("#username").fill("Notch");
   await pendingPage.getByRole("button", { name: "Continuer" }).click();
   await pendingPage.waitForTimeout(1600);
 

@@ -32,7 +32,7 @@ Captures générées en **mode démo**, avec les données et les visuels de seco
 - Fiches packages : galerie, description riche, options/variables, quantité, abonnement ou achat unique.
 - Panier : quantités, suppression, code promo, total, checkout Tebex.
 - Connexion pseudo Minecraft Java, panier conservé en cookie httpOnly.
-- Avatars Minecraft affichés via un proxy first-party (`/api/avatar`) avec cache serveur et fallback minotar.
+- Avatars Minecraft affichés via un proxy first-party (`/api/avatar`) : résolution du pseudo en UUID via Mojang/Microsoft, fallback minotar/mc-heads, cache 24 h et initiales pour les comptes inexistants.
 - Mode démo complet sans boutique Tebex, avec produits fictifs et panier simulé.
 - Statut serveur via `mcsrvstat.us` et stats Discord via l’API publique d’invitation.
 - Pages légales, 404, erreurs, sitemap, robots et image Open Graph.
@@ -403,7 +403,7 @@ Si Edge n’est pas au chemin par défaut, définis `EDGE_PATH`.
 - Les descriptions Tebex sont nettoyées avec une allowlist (`sanitize-html`) avant rendu, et le JSON-LD est échappé.
 - Les réponses d’erreur Tebex ne sont pas renvoyées telles quelles au client.
 - Une CSP complète est configurée (scripts, styles, images, frames, connect, form-action, frame-ancestors), avec `X-Frame-Options`, `nosniff`, HSTS et `Referrer-Policy`.
-- Tebex.js n’est chargé qu’au clic sur « Passer au paiement » ; YouTube est soumis au consentement. Les avatars Minecraft sont servis par la route first-party `/api/avatar/[username]` (cache serveur de 24 h, fallback minotar), donc aucune requête du navigateur vers mc-heads.
+- Tebex.js n’est chargé qu’au clic sur « Passer au paiement » ; YouTube est soumis au consentement. Les avatars Minecraft sont servis par la route first-party `/api/avatar/[username]` : résolution du pseudo en UUID via Mojang/Microsoft, fallback minotar/mc-heads, cache serveur de 24 h et 404 pour les comptes inexistants. Aucune requête du navigateur vers ces services.
 - Le rate limiting fourni est best-effort et local à l’instance ; pour un déploiement multi-instance, ajouter Vercel WAF ou Upstash. `TRUST_PROXY` doit être configuré en self-hosted.
 - Les prix et la disponibilité sont lus depuis Tebex ; le site ne fait pas confiance à un prix envoyé par le client.
 - Les textes légaux et la mention **Tebex merchant of record** sont inclus dans le footer. Ne les supprime pas sans raison légale.

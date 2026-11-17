@@ -687,5 +687,7 @@ export async function logoutAction(): Promise<void> {
   await clearMockBasketCookie();
   await clearPendingAddCookie();
   revalidatePath("/", "layout");
+  revalidatePath("/login");
+  revalidatePath("/cart");
   redirect("/");
 }

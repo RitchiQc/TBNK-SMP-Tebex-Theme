@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react";
 import { initials } from "@/lib/format";
 
+const AVATAR_VERSION = 2;
+
 export function PlayerAvatar({
   username,
   size = 38,
@@ -48,7 +50,7 @@ export function PlayerAvatar({
     <img
       className={`avatar ${className}`}
       style={{ width: size, height: size }}
-      src={`/api/avatar/${encodeURIComponent(username)}?size=${size * 2}${retry}`}
+      src={`/api/avatar/${encodeURIComponent(username)}?size=${size * 2}&v=${AVATAR_VERSION}${retry}`}
       alt={`Avatar de ${username}`}
       width={size}
       height={size}

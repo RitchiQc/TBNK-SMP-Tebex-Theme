@@ -481,7 +481,7 @@ sudo reboot
 
 - Mettre à jour lib/legal/privacy.ts : remplacer Vercel par OVHcloud, hébergement et journaux techniques (Beauharnois, Québec, Canada).
 - Mettre à jour la date de la politique de confidentialité.
-- EFVP : l'hébergement reste au Québec ; Tebex (Royaume-Uni), Discord (États-Unis), YouTube/Google et mc-heads (avatars proxifiés côté serveur) restent des transferts à documenter.
+- EFVP : l'hébergement reste au Québec ; Tebex (Royaume-Uni), Discord (États-Unis), YouTube/Google, Mojang/Microsoft (résolution UUID) et minotar/mc-heads (avatars proxifiés côté serveur) restent des transferts à documenter.
 - OVHcloud agit comme sous-traitant : conserver le contrat/DPA.
 - Conserver les conditions Tebex, le registre des incidents et les preuves de sauvegarde.
 - Mettre à jour README.md et docs/legal/checklist-quebec.md pour refléter OVHcloud.
