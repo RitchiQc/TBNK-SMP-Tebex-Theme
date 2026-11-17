@@ -12,7 +12,7 @@ export async function SiteHeader() {
   return (
     <HeaderClient
       storeName={webstore.name || siteConfig.name}
-      logo={webstore.logo || siteConfig.logo}
+      logo={siteConfig.logo}
       categories={categories.map((category) => ({
         name: category.name,
         slug: category.slug,

@@ -19,7 +19,7 @@ export async function SiteFooter() {
           <div className="footer-brand">
             <img
               className="footer-logo"
-              src={webstore.logo || siteConfig.logo}
+              src={siteConfig.logo}
               alt={webstore.name || siteConfig.name}
             />
             <p className="footer-tagline">
