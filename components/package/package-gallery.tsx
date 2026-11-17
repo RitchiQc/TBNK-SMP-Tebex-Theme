@@ -52,7 +52,6 @@ export function PackageGallery({
   function allowMedia(): void {
     saveConsent({
       media: true,
-      avatars: consent.avatars,
       version: CONSENT_VERSION
     });
   }

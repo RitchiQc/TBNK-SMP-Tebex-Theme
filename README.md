@@ -32,6 +32,7 @@ Captures générées en **mode démo**, avec les données et les visuels de seco
 - Fiches packages : galerie, description riche, options/variables, quantité, abonnement ou achat unique.
 - Panier : quantités, suppression, code promo, total, checkout Tebex.
 - Connexion pseudo Minecraft Java, panier conservé en cookie httpOnly.
+- Avatars Minecraft affichés via un proxy first-party (`/api/avatar`) avec cache serveur et fallback minotar.
 - Mode démo complet sans boutique Tebex, avec produits fictifs et panier simulé.
 - Statut serveur via `mcsrvstat.us` et stats Discord via l’API publique d’invitation.
 - Pages légales, 404, erreurs, sitemap, robots et image Open Graph.
@@ -119,7 +120,7 @@ Avant une ouverture publique au Québec :
 
 - désigner un **responsable de la protection des renseignements personnels** et publier son **titre et ses coordonnées** (art. 3.1 P-39.1 : le nom personnel n'est pas exigé) ;
 - compléter la politique de confidentialité (finalités, droits, témoins, tiers, transferts hors Québec, incidents, mineurs de moins de 14 ans, plainte CAI) ;
-- recueillir un **consentement explicite** pour les témoins non nécessaires (YouTube, avatars mc-heads) et permettre le retrait à tout moment ;
+- recueillir un **consentement explicite** pour les témoins non nécessaires (YouTube) et permettre le retrait à tout moment ;
 - afficher clairement que **Tebex est le vendeur et marchand of record** (le contrat de vente est conclu exclusivement avec Tebex) et fournir ses conditions/coordonnées avant l’achat ; si TBNK-SMP est le vendeur, renseigner `NEXT_PUBLIC_LEGAL_*` ;
 - afficher clairement les taxes et le total avant paiement ;
 - vérifier que Tebex envoie un **reçu/contrat en français** dans les 15 jours et que le checkout est en français ;
@@ -298,6 +299,7 @@ app/
 ├─ status/page.tsx         # statut serveur/Discord
 ├─ guide/page.tsx          # comment rejoindre le serveur
 ├─ legal/[slug]/page.tsx   # pages légales
+├─ api/avatar/[username]/route.ts # proxy avatar first-party + cache
 ├─ sitemap.ts, robots.ts, opengraph-image.tsx
 components/
 ├─ layout/                 # header, menu mobile, footer
@@ -312,6 +314,7 @@ lib/
 ├─ basket/                 # cookies, session, actions serveur
 ├─ community/              # Discord + statut Minecraft
 ├─ legal/                  # contenu des pages légales
+├─ minecraft/              # validation des pseudos Minecraft
 ├─ format.ts, site.ts
 data/
 ├─ mock.ts, seeds/         # catalogue de démonstration
@@ -373,6 +376,7 @@ Si Edge n’est pas au chemin par défaut, définis `EDGE_PATH`.
 - application du code promo **TBNK10** ;
 - ouverture de la modale de checkout démo ;
 - suppression de l’article et retour à l’état vide ;
+- chargement de l’avatar Minecraft via le proxy first-party `/api/avatar` ;
 - absence d’erreur console.
 
 ### Validation avant mise en ligne
@@ -399,7 +403,7 @@ Si Edge n’est pas au chemin par défaut, définis `EDGE_PATH`.
 - Les descriptions Tebex sont nettoyées avec une allowlist (`sanitize-html`) avant rendu, et le JSON-LD est échappé.
 - Les réponses d’erreur Tebex ne sont pas renvoyées telles quelles au client.
 - Une CSP complète est configurée (scripts, styles, images, frames, connect, form-action, frame-ancestors), avec `X-Frame-Options`, `nosniff`, HSTS et `Referrer-Policy`.
-- Tebex.js n’est chargé qu’au clic sur « Passer au paiement » ; YouTube et mc-heads sont soumis au consentement.
+- Tebex.js n’est chargé qu’au clic sur « Passer au paiement » ; YouTube est soumis au consentement. Les avatars Minecraft sont servis par la route first-party `/api/avatar/[username]` (cache serveur de 24 h, fallback minotar), donc aucune requête du navigateur vers mc-heads.
 - Le rate limiting fourni est best-effort et local à l’instance ; pour un déploiement multi-instance, ajouter Vercel WAF ou Upstash. `TRUST_PROXY` doit être configuré en self-hosted.
 - Les prix et la disponibilité sont lus depuis Tebex ; le site ne fait pas confiance à un prix envoyé par le client.
 - Les textes légaux et la mention **Tebex merchant of record** sont inclus dans le footer. Ne les supprime pas sans raison légale.

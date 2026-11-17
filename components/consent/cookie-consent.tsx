@@ -15,14 +15,12 @@ export function CookieConsent() {
   const [open, setOpen] = useState(false);
   const [details, setDetails] = useState(false);
   const [media, setMedia] = useState(false);
-  const [avatars, setAvatars] = useState(false);
   const regionRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const sync = () => {
       const current = readConsentCookie();
       setMedia(current.media);
-      setAvatars(current.avatars);
     };
 
     const onOpen = () => {
@@ -52,10 +50,9 @@ export function CookieConsent() {
     if (open) regionRef.current?.focus();
   }, [open]);
 
-  function persist(nextMedia: boolean, nextAvatars: boolean): void {
+  function persist(nextMedia: boolean): void {
     saveConsent({
       media: nextMedia,
-      avatars: nextAvatars,
       version: CONSENT_VERSION
     });
     setOpen(false);
@@ -74,9 +71,8 @@ export function CookieConsent() {
       <div className="cookie-consent__header">
         <h2 id="cookie-consent-title">Tes préférences de confidentialité</h2>
         <p>
-          Les témoins nécessaires font fonctionner le panier. Les contenus
-          tiers (YouTube, avatars mc-heads) restent désactivés tant que tu ne
-          les acceptes pas.
+          Les témoins nécessaires font fonctionner le panier. Les vidéos
+          YouTube restent désactivées tant que tu ne les acceptes pas.
         </p>
       </div>
 
@@ -100,17 +96,6 @@ export function CookieConsent() {
               <small>Lecture des vidéos de présentation via YouTube.</small>
             </span>
           </label>
-          <label className="cookie-consent__option">
-            <input
-              type="checkbox"
-              checked={avatars}
-              onChange={(event) => setAvatars(event.target.checked)}
-            />
-            <span>
-              <b>Avatars Minecraft</b>
-              <small>Chargement des avatars via mc-heads.net.</small>
-            </span>
-          </label>
         </div>
       ) : null}
 
@@ -118,7 +103,7 @@ export function CookieConsent() {
         <button
           type="button"
           className="btn btn-secondary btn-sm"
-          onClick={() => persist(false, false)}
+          onClick={() => persist(false)}
         >
           Tout refuser
         </button>
@@ -126,7 +111,7 @@ export function CookieConsent() {
           <button
             type="button"
             className="btn btn-secondary btn-sm"
-            onClick={() => persist(media, avatars)}
+            onClick={() => persist(media)}
           >
             Enregistrer mes choix
           </button>
@@ -142,7 +127,7 @@ export function CookieConsent() {
         <button
           type="button"
           className="btn btn-primary btn-sm"
-          onClick={() => persist(true, true)}
+          onClick={() => persist(true)}
         >
           Tout accepter
         </button>

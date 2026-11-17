@@ -65,7 +65,12 @@ export default async function LoginPage({
         {username ? (
           <div className="form-card" style={{ maxWidth: 760 }}>
             <div className="account-card">
-              <PlayerAvatar username={username} size={72} className="avatar--lg" />
+              <PlayerAvatar
+                username={username}
+                size={72}
+                className="avatar--lg"
+                priority
+              />
               <div className="account-card__info">
                 <div className="account-card__name">{username}</div>
                 <p className="account-card__meta">

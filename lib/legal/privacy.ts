@@ -30,7 +30,7 @@ export const privacy: LegalPage = {
       <li>afficher le catalogue, gérer le panier et associer un achat au bon pseudo (exécution du contrat) ;</li>
       <li>permettre le paiement, la livraison et le support (exécution du contrat) ;</li>
       <li>prévenir la fraude et assurer la sécurité du site (intérêt légitime) ;</li>
-      <li>charger les contenus tiers (YouTube, avatars mc-heads) uniquement avec ton consentement.</li>
+      <li>charger les contenus tiers (YouTube) uniquement avec ton consentement.</li>
     </ul>
     <p>Nous ne vendons pas tes renseignements personnels et ne les utilisons pas pour de la publicité ciblée.</p>
 
@@ -39,14 +39,14 @@ export const privacy: LegalPage = {
     <p>Les témoins strictement nécessaires au panier et à la sécurité ne dépendent pas du consentement, car ils sont indispensables au service demandé.</p>
 
     <h2 id="cookies">5. Témoins (cookies) et technologies de suivi</h2>
-    <p>Seuls les témoins strictement nécessaires sont actifs par défaut. Les contenus tiers sont désactivés tant que tu ne les acceptes pas.</p>
+    <p>Seuls les témoins strictement nécessaires sont actifs par défaut. Les vidéos YouTube sont désactivées tant que tu ne les acceptes pas.</p>
     <ul>
       <li><strong>Panier et session</strong> — <code>tbnk_basket_ident</code> (ou <code>__Host-tbnk_basket_ident</code> en production), <code>tbnk_username</code>, <code>tbnk_pending_add</code> : fonctionnement du panier, 7 jours, httpOnly et SameSite=Lax.</li>
       <li><strong>Démo uniquement</strong> — <code>tbnk_mock_basket</code> : panier fictif en développement/préproduction, 7 jours.</li>
       <li><strong>Consentement</strong> — <code>tbnk_consent</code> : mémorise tes choix, 6 mois, SameSite=Lax.</li>
       <li><strong>Tebex.js</strong> — chargé uniquement lorsque tu cliques sur « Passer au paiement ». Tebex peut déposer ses propres témoins pour le paiement ; consulte la <a href="https://www.tebex.io/privacy" target="_blank" rel="noopener noreferrer">politique de Tebex</a>.</li>
       <li><strong>YouTube</strong> — une vidéo n’est chargée qu’après ton action ou ton consentement, via <code>youtube-nocookie.com</code>. Consulte la <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer">politique de Google</a>.</li>
-      <li><strong>Avatars Minecraft</strong> — chargés depuis <code>mc-heads.net</code> uniquement si tu acceptes la catégorie « Avatars ». Sinon, les initiales sont affichées.</li>
+      <li><strong>Avatars Minecraft</strong> — récupérés côté serveur depuis <code>mc-heads.net</code> et mis en cache ; ton navigateur ne contacte jamais mc-heads directement.</li>
     </ul>
     <p>Aucun outil de mesure d’audience ou de publicité n’est utilisé à ce jour. S’il est ajouté, il sera soumis au consentement préalable.</p>
 
@@ -55,7 +55,7 @@ export const privacy: LegalPage = {
     <ul>
       <li><strong>Tebex</strong> — paiement, taxes, remboursements et livraison ;</li>
       <li><strong>Discord</strong> — communauté et support, si tu rejoins le serveur ;</li>
-      <li><strong>mc-heads.net</strong> — avatars Minecraft, avec consentement ;</li>
+      <li><strong>mc-heads.net</strong> — avatars Minecraft récupérés côté serveur et mis en cache (aucune requête directe de ton navigateur) ;</li>
       <li><strong>mcsrvstat.us</strong> — statut public du serveur ;</li>
       <li><strong>YouTube/Google</strong> — vidéos, avec consentement.</li>
     </ul>

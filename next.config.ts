@@ -32,7 +32,7 @@ const contentSecurityPolicy = [
   "default-src 'self'",
   `script-src ${scriptSources}`,
   "style-src 'self' 'unsafe-inline'",
-  "img-src 'self' data: blob: https://tebex.io https://*.tebex.io https://*.tebexcdn.com https://cdn.tebex.io https://dunb17ur4ymx4.cloudfront.net https://mc-heads.net https://cdn.discordapp.com https://i.ytimg.com https://www.youtube.com",
+  "img-src 'self' data: blob: https://tebex.io https://*.tebex.io https://*.tebexcdn.com https://cdn.tebex.io https://dunb17ur4ymx4.cloudfront.net https://cdn.discordapp.com https://i.ytimg.com https://www.youtube.com",
   "font-src 'self' data:",
   `connect-src ${connectSources}`,
   "frame-src https://tebex.io https://*.tebex.io https://tebex.com https://*.tebex.com https://www.youtube.com https://www.youtube-nocookie.com",
@@ -75,7 +75,7 @@ const nextConfig: NextConfig = {
         headers: privateHeaders
       },
       {
-        source: "/api/:path*",
+        source: "/api/checkout/:path*",
         headers: privateHeaders
       },
       {
@@ -113,7 +113,6 @@ const nextConfig: NextConfig = {
       { protocol: "https", hostname: "**.tebex.io" },
       { protocol: "https", hostname: "**.tebexcdn.com" },
       { protocol: "https", hostname: "cdn.tebex.io" },
-      { protocol: "https", hostname: "mc-heads.net" },
       { protocol: "https", hostname: "cdn.discordapp.com" },
       { protocol: "https", hostname: "i.ytimg.com" }
     ]

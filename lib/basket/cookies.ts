@@ -4,6 +4,7 @@ import { createHmac, timingSafeEqual } from "node:crypto";
 import { cookies } from "next/headers";
 import { cookieSecret, isPreview, isProduction } from "@/lib/env";
 import { safeRedirectPath } from "@/lib/format";
+import { USERNAME_PATTERN } from "@/lib/minecraft/username";
 import { isValidBasketIdent } from "@/lib/tebex/ids";
 import type { PendingAdd } from "./action-types";
 
@@ -15,7 +16,6 @@ export const MOCK_BASKET_COOKIE = `${PREFIX}tbnk_mock_basket`;
 export const PENDING_ADD_COOKIE = `${PREFIX}tbnk_pending_add`;
 
 const MAX_AGE = 60 * 60 * 24 * 7;
-const USERNAME_PATTERN = /^[A-Za-z0-9_]{3,16}$/;
 const MAX_MOCK_BASKET_LENGTH = 3000;
 const MAX_PENDING_ADD_LENGTH = 2800;
 const MAX_VARIABLE_COUNT = 50;

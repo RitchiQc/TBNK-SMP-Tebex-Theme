@@ -58,7 +58,7 @@ Sources :
 - [ ] Le choix peut être modifié via « Gérer mes cookies ».
 - [ ] Tebex.js n'est chargé qu'au clic de paiement.
 - [ ] YouTube est en click-to-load / `youtube-nocookie.com`.
-- [ ] Les avatars mc-heads ne sont chargés qu'avec consentement.
+- [ ] Les avatars mc-heads sont proxifiés côté serveur (aucune requête directe du navigateur) et mis en cache.
 - [ ] Aucun outil d'analyse/publicité n'est ajouté sans consentement.
 
 ## 4. LPC — contrat à distance

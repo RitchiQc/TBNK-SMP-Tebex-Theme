@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 
 export const CONSENT_COOKIE = "tbnk_consent";
-export const CONSENT_VERSION = 1;
+export const CONSENT_VERSION = 2;
 export const CONSENT_EVENT = "tbnk:consent";
 export const OPEN_CONSENT_EVENT = "tbnk:open-consent";
 export const CONSENT_MAX_AGE = 60 * 60 * 24 * 183;
@@ -11,14 +11,12 @@ export const CONSENT_MAX_AGE = 60 * 60 * 24 * 183;
 export type ConsentState = {
   necessary: true;
   media: boolean;
-  avatars: boolean;
   version: number;
 };
 
 export const DEFAULT_CONSENT: ConsentState = {
   necessary: true,
   media: false,
-  avatars: false,
   version: CONSENT_VERSION
 };
 
@@ -46,7 +44,6 @@ export function readConsentCookie(): ConsentState {
     return {
       necessary: true,
       media: parsed.media === true,
-      avatars: parsed.avatars === true,
       version:
         typeof parsed.version === "number"
           ? parsed.version
@@ -61,7 +58,6 @@ export function saveConsent(next: Omit<ConsentState, "necessary">): void {
   const state: ConsentState = {
     necessary: true,
     media: next.media === true,
-    avatars: next.avatars === true,
     version: CONSENT_VERSION
   };
 

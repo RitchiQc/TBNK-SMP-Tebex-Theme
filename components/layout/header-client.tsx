@@ -118,7 +118,7 @@ export function HeaderClient({
                 className="user-button"
                 aria-label={`Compte de ${username}`}
               >
-                <PlayerAvatar username={username} size={30} />
+                <PlayerAvatar username={username} size={30} priority />
                 <span className="user-name">{username}</span>
               </Link>
             ) : (

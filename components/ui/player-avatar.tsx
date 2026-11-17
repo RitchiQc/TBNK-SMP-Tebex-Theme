@@ -1,22 +1,28 @@
 "use client";
 
-import { useState } from "react";
-import { useConsent } from "@/lib/consent-client";
+import { useEffect, useState } from "react";
 import { initials } from "@/lib/format";
 
 export function PlayerAvatar({
   username,
   size = 38,
-  className = ""
+  className = "",
+  priority = false
 }: {
   username: string | null | undefined;
   size?: number;
   className?: string;
+  priority?: boolean;
 }) {
   const [failed, setFailed] = useState(false);
-  const consent = useConsent();
+  const [attempt, setAttempt] = useState(0);
 
-  if (!username || failed || !consent.avatars) {
+  useEffect(() => {
+    setFailed(false);
+    setAttempt(0);
+  }, [username]);
+
+  if (!username || failed) {
     return (
       <span
         className={`avatar ${className}`}
@@ -36,14 +42,26 @@ export function PlayerAvatar({
     );
   }
 
+  const retry = attempt > 0 ? `&retry=${attempt}` : "";
+
   return (
     <img
       className={`avatar ${className}`}
       style={{ width: size, height: size }}
-      src={`https://mc-heads.net/avatar/${encodeURIComponent(username)}/${size * 2}`}
+      src={`/api/avatar/${encodeURIComponent(username)}?size=${size * 2}${retry}`}
       alt={`Avatar de ${username}`}
-      loading="lazy"
-      onError={() => setFailed(true)}
+      width={size}
+      height={size}
+      loading={priority ? "eager" : "lazy"}
+      decoding="async"
+      referrerPolicy="no-referrer"
+      onError={() => {
+        if (attempt < 1) {
+          setAttempt((value) => value + 1);
+          return;
+        }
+        setFailed(true);
+      }}
     />
   );
 }

@@ -24,8 +24,7 @@ await context.addCookies([
       JSON.stringify({
         necessary: true,
         media: false,
-        avatars: false,
-        version: 1
+        version: 2
       })
     ),
     domain: BASE_HOST,
@@ -109,6 +108,31 @@ try {
     .getByText("Ton panier est vide", { exact: false })
     .isVisible()
     .catch(() => false);
+
+  await page.goto(`${BASE_URL}/login`, { waitUntil: "networkidle" });
+  await page.fill("#username", "ritchiqc");
+  await page
+    .waitForFunction(
+      () => {
+        const image = document.querySelector(".login-avatar img.avatar");
+        return (
+          image instanceof HTMLImageElement &&
+          image.complete &&
+          image.naturalWidth > 0
+        );
+      },
+      { timeout: 10000 }
+    )
+    .catch(() => null);
+  const loginAvatar = page.locator(".login-avatar img.avatar").first();
+  checks.loginAvatarLoaded = await loginAvatar
+    .evaluate(
+      (image) =>
+        image instanceof HTMLImageElement &&
+        image.complete &&
+        image.naturalWidth > 0
+    )
+    .catch(() => false);
 } catch (error) {
   checks.error = error instanceof Error ? error.message : String(error);
 }
@@ -123,6 +147,7 @@ const passed =
   checks.totalBefore !== checks.totalAfterCoupon &&
   checks.demoModalVisible === true &&
   checks.emptyAfterRemove === true &&
+  checks.loginAvatarLoaded === true &&
   checks.consoleErrors.length === 0;
 
 console.log(passed ? "\nE2E demo flow passed." : "\nE2E demo flow has issues.");

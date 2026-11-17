@@ -20,8 +20,7 @@ async function acceptNecessaryConsent(context) {
         JSON.stringify({
           necessary: true,
           media: false,
-          avatars: false,
-          version: 1
+          version: 2
         })
       ),
       domain: BASE_HOST,
@@ -109,6 +108,52 @@ try {
     failures.push(
       `redirection ouverte : le login a quitté l'origine (${loginPage.url()})`
     );
+  }
+
+  await loginPage.goto(`${BASE_URL}/login`, { waitUntil: "networkidle" });
+  await loginPage
+    .waitForFunction(
+      () => {
+        const image = document.querySelector(
+          ".account-card img.avatar--lg"
+        );
+        return (
+          image instanceof HTMLImageElement &&
+          image.complete &&
+          image.naturalWidth > 0
+        );
+      },
+      { timeout: 10000 }
+    )
+    .catch(() => null);
+  const accountAvatar = loginPage
+    .locator(".account-card img.avatar--lg")
+    .first();
+  const accountAvatarLoaded = await accountAvatar
+    .evaluate(
+      (image) =>
+        image instanceof HTMLImageElement &&
+        image.complete &&
+        image.naturalWidth > 0
+    )
+    .catch(() => false);
+  results.accountAvatarLoaded = accountAvatarLoaded;
+  if (!accountAvatarLoaded) {
+    failures.push("Avatar de la carte de compte non chargé.");
+  }
+
+  const sessionCookies = await loginContext.cookies();
+  const cookieHeader = sessionCookies
+    .map((cookie) => `${cookie.name}=${cookie.value}`)
+    .join("; ");
+  const loginHtml = await (
+    await fetch(`${BASE_URL}/login`, {
+      headers: { cookie: cookieHeader }
+    })
+  ).text();
+  results.loginAvatarInSsr = loginHtml.includes("/api/avatar/Alex_13241");
+  if (!results.loginAvatarInSsr) {
+    failures.push("L'avatar n'est pas rendu côté serveur sur /login.");
   }
 
   await loginContext.close();
