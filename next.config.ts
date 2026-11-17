@@ -32,7 +32,7 @@ const contentSecurityPolicy = [
   "default-src 'self'",
   `script-src ${scriptSources}`,
   "style-src 'self' 'unsafe-inline'",
-  "img-src 'self' data: blob: https://tebex.io https://*.tebex.io https://*.tebexcdn.com https://cdn.tebex.io https://mc-heads.net https://cdn.discordapp.com https://i.ytimg.com https://www.youtube.com",
+  "img-src 'self' data: blob: https://tebex.io https://*.tebex.io https://*.tebexcdn.com https://cdn.tebex.io https://dunb17ur4ymx4.cloudfront.net https://mc-heads.net https://cdn.discordapp.com https://i.ytimg.com https://www.youtube.com",
   "font-src 'self' data:",
   `connect-src ${connectSources}`,
   "frame-src https://tebex.io https://*.tebex.io https://tebex.com https://*.tebex.com https://www.youtube.com https://www.youtube-nocookie.com",
