@@ -4,6 +4,7 @@ import { CartLine } from "@/components/cart/cart-line";
 import { CheckoutButton } from "@/components/cart/checkout-button";
 import { CouponForm } from "@/components/cart/coupon-form";
 import { Icon } from "@/components/ui/icons";
+import { startNewBasketAction } from "@/lib/basket/actions";
 import { getBasketIdentCookie } from "@/lib/basket/cookies";
 import {
   getCurrentBasketSafe,
@@ -28,6 +29,7 @@ export default async function CartPage() {
   ]);
 
   const currency = basket?.currency || siteConfig.currency;
+  const paidBasket = Boolean(basket?.complete);
   const isEmpty = !basket || basket.packages.length === 0;
   const cartUnavailable = Boolean(basketIdent) && !basket;
   const unavailable = store.unavailable || cartUnavailable;
@@ -75,6 +77,20 @@ export default async function CartPage() {
               pour le moment. Ton panier n’est pas perdu : recharge la page dans
               un instant.
             </p>
+          </div>
+        ) : null}
+
+        {paidBasket ? (
+          <div className="cart-login-banner" style={{ marginBottom: 16 }}>
+            <p>
+              <b>Ce panier a déjà été payé.</b> Ses articles ne peuvent plus
+              être modifiés. Démarre un nouveau panier pour continuer.
+            </p>
+            <form action={startNewBasketAction}>
+              <button type="submit" className="btn btn-primary btn-sm">
+                Nouveau panier
+              </button>
+            </form>
           </div>
         ) : null}
 
@@ -179,7 +195,7 @@ export default async function CartPage() {
                 </p>
 
                 <CheckoutButton
-                  disabled={basket.packages.length === 0}
+                  disabled={basket.packages.length === 0 || paidBasket}
                   isMock={basket.isMock}
                 />
 

@@ -30,7 +30,7 @@ Captures générées en **mode démo**, avec les données et les visuels de seco
 - Page Guide dédiée pour rejoindre le serveur (Java uniquement).
 - Boutique complète : catégories, recherche, tri, grille responsive, prix CAD, badges promo/populaire.
 - Fiches packages : galerie, description riche, options/variables, quantité, abonnement ou achat unique.
-- Panier : quantités, suppression, code promo, total, checkout Tebex.
+- Panier : quantités, suppression, code promo, total, checkout Tebex. Les prix de ligne sont calculés à partir du prix unitaire Tebex × quantité ; un panier déjà payé est automatiquement réinitialisé.
 - Connexion pseudo Minecraft Java, panier conservé en cookie httpOnly.
 - Avatars Minecraft affichés via un proxy first-party (`/api/avatar`) : résolution du pseudo en UUID via Mojang/Microsoft, fallback minotar/mc-heads, cache 24 h et initiales pour les comptes inexistants.
 - Mode démo complet sans boutique Tebex, avec produits fictifs et panier simulé.
@@ -331,9 +331,10 @@ scripts/
 1. L’utilisateur ajoute un package depuis une carte ou une fiche.
 2. En mode réel, le pseudo Minecraft est requis avant l’ajout. S’il manque, l’action stocke l’ajout en attente et redirige vers `/login`.
 3. Le panier Tebex est créé côté serveur avec `username`, puis stocké dans un cookie httpOnly.
-4. Les quantités et suppressions passent par des Server Actions.
-5. Le code promo est appliqué via l’API Headless.
-6. Le checkout utilise **Tebex.js**. En cas d’échec, le site redirige vers `basket.links.checkout`.
+4. Les quantités et suppressions passent par des Server Actions. La référence envoyée à Tebex est l’`ident` réel (résolu via le catalogue) ou l’ID numérique, jamais un ident fabriqué.
+5. Un panier marqué `complete` par Tebex n’est jamais réutilisé : le site le remplace par un panier neuf et affiche une bannière « panier déjà payé ».
+6. Le code promo est appliqué via l’API Headless.
+7. Le checkout utilise **Tebex.js**. En cas d’échec, le site redirige vers `basket.links.checkout`.
 
 ### API Tebex
 
@@ -372,6 +373,7 @@ Si Edge n’est pas au chemin par défaut, définis `EDGE_PATH`.
 
 - ajout d’un package avec quantité 5 ;
 - compteur du panier ;
+- prix de ligne = prix unitaire × quantité (et prix unitaire affiché) ;
 - total CAD ;
 - application du code promo **TBNK10** ;
 - ouverture de la modale de checkout démo ;

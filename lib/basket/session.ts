@@ -109,9 +109,16 @@ export async function ensureBasket(
   }
 
   const existing = options?.forceNew ? null : await getCurrentBasket();
-  if (existing) {
+  if (existing?.complete) {
+    // Un panier déjà payé ne doit jamais être réutilisé pour de nouveaux
+    // achats : on repart sur un panier neuf.
+    await clearBasketIdentCookie();
+  }
+
+  const reusable = existing && !existing.complete ? existing : null;
+  if (reusable) {
     const requestedUsername = username ?? (await getUsernameCookie());
-    const basketUsername = existing.username;
+    const basketUsername = reusable.username;
 
     // Un panier existant ne doit jamais être réutilisé pour un autre pseudo :
     // cela évite les scénarios de fixation de panier et les livraisons au
@@ -121,7 +128,7 @@ export async function ensureBasket(
       !basketUsername ||
       basketUsername.toLowerCase() === requestedUsername.toLowerCase()
     ) {
-      return existing;
+      return reusable;
     }
 
     await clearBasketIdentCookie();

@@ -34,8 +34,7 @@ export function CartLine({
     !item.image || imageError
       ? "/images/package-placeholder.svg"
       : item.image;
-  const unitPrice =
-    item.quantity > 0 ? item.price / item.quantity : item.price;
+  const linePrice = Math.round(item.unitPrice * item.quantity * 100) / 100;
 
   function commit(nextQuantity: number) {
     const next = Math.min(50, Math.max(1, Math.trunc(nextQuantity)));
@@ -43,7 +42,7 @@ export function CartLine({
     if (next === item.quantity) return;
 
     startTransition(async () => {
-      const result = await updateQuantityAction(item.ident, next);
+      const result = await updateQuantityAction(item.id, next);
       if (result.success) {
         toast(result.message ?? "Quantité mise à jour.", {
           variant: "success"
@@ -62,7 +61,7 @@ export function CartLine({
 
   function remove() {
     startTransition(async () => {
-      const result = await removeFromBasketAction(item.ident);
+      const result = await removeFromBasketAction(item.id);
       if (result.success) {
         toast(result.message ?? "Package retiré.", { variant: "success" });
         router.refresh();
@@ -102,11 +101,11 @@ export function CartLine({
           </div>
         ) : null}
         <div className="cart-line__price">
-          {formatCurrency(item.price, currency)}
+          {formatCurrency(linePrice, currency)}
           {item.quantity > 1 ? (
             <span className="muted small">
               {" "}
-              · {formatCurrency(unitPrice, currency)} / unité
+              · {formatCurrency(item.unitPrice, currency)} / unité
             </span>
           ) : null}
         </div>

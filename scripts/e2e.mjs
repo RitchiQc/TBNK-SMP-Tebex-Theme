@@ -73,6 +73,11 @@ try {
   checks.totalBefore = await page
     .locator(".summary-total strong")
     .innerText();
+  checks.linePrice = await page
+    .locator(".cart-line__price")
+    .first()
+    .innerText()
+    .catch(() => null);
 
   await page.locator(".coupon-form input").fill("TBNK10");
   await page.getByRole("button", { name: "Appliquer" }).click();
@@ -144,6 +149,9 @@ const passed =
   !checks.error &&
   checks.cartLines === 1 &&
   checks.quantity === "5" &&
+  typeof checks.linePrice === "string" &&
+  checks.linePrice.includes("22,45") &&
+  checks.linePrice.includes("4,49") &&
   checks.totalBefore !== checks.totalAfterCoupon &&
   checks.demoModalVisible === true &&
   checks.emptyAfterRemove === true &&

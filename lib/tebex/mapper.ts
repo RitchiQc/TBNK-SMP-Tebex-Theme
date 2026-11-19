@@ -184,7 +184,8 @@ export function mapPackage(
   const totalPrice = toNum(source.total_price, basePrice);
   const discount = Math.max(0, basePrice - totalPrice, toNum(source.discount));
   const type = toPackageType(source.type);
-  const ident = toStr(source.ident, `pkg_${category.id}_${id}`);
+  // Ne jamais fabriquer d'ident : Tebex accepte l'ID numérique en repli.
+  const ident = toStr(source.ident, String(id));
   const primaryMedia =
     media.length > 0
       ? media
@@ -235,18 +236,19 @@ function mapBasketPackage(raw: unknown): BasketPackage {
   const inBasket = isRecord(source.in_basket) ? source.in_basket : {};
   const optionsRaw = Array.isArray(source.options) ? source.options : [];
   const id = toNum(source.id);
-  const ident = toStr(source.ident, `pkg_${id}`);
+  // Tebex n'expose pas d'`ident` pour un package de panier : on ne fabrique rien.
+  const ident = toNullableStr(source.ident) ?? "";
 
   return {
     id,
     ident,
     name: toStr(source.name, "Package"),
-    slug: toStr(source.slug, ident),
+    slug: toStr(source.slug, ident || String(id)),
     description: toStr(source.description),
     image: toHttpsUrl(source.image),
     type: toPackageType(source.type),
     quantity: toNum(inBasket.quantity, 1),
-    price: toNum(inBasket.price),
+    unitPrice: toNum(inBasket.price),
     options: optionsRaw
       .filter(isRecord)
       .map((option) => ({
@@ -268,6 +270,7 @@ export function mapBasket(raw: unknown): Basket {
 
   return {
     ident: toStr(source.ident),
+    complete: toBool(source.complete),
     username: toNullableStr(source.username),
     currency: toStr(source.currency, siteConfig.currency).toUpperCase(),
     basePrice: toNum(source.base_price),

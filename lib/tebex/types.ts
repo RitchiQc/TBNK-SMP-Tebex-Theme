@@ -95,6 +95,7 @@ export interface BasketPackageOption {
 
 export interface BasketPackage {
   id: number;
+  /** Ident réel si Tebex le fournit ; sinon vide (le panier n'expose que `id`). */
   ident: string;
   name: string;
   slug: string;
@@ -102,8 +103,8 @@ export interface BasketPackage {
   image: string | null;
   type: PackageType;
   quantity: number;
-  /** Prix de la ligne tel que retourné par Tebex (ou simulé en mode démo). */
-  price: number;
+  /** Prix unitaire Tebex (`in_basket.price`), hors taxes. */
+  unitPrice: number;
   options: BasketPackageOption[];
   expiryPeriod?: string;
 }
@@ -118,6 +119,8 @@ export interface GiftCard {
 
 export interface Basket {
   ident: string;
+  /** Panier déjà payé : ne peut plus être modifié ni réutilisé. */
+  complete: boolean;
   username: string | null;
   currency: string;
   basePrice: number;

@@ -173,7 +173,7 @@ export function buildMockBasket(
       image: pkg.image,
       type: pkg.type,
       quantity: item.quantity,
-      price: linePrice,
+      unitPrice: pkg.totalPrice,
       options: []
     });
   }
@@ -186,6 +186,7 @@ export function buildMockBasket(
 
   return {
     ident: "demo-basket",
+    complete: false,
     username,
     currency: siteConfig.currency,
     basePrice: roundMoney(basePrice),

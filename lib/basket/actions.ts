@@ -13,8 +13,16 @@ import {
   TebexError,
   updatePackageQuantityRaw
 } from "@/lib/tebex/client";
-import { getPackageByIdent, getWebstore } from "@/lib/tebex/store";
-import type { Package, PackageVariable } from "@/lib/tebex/types";
+import {
+  getPackageById,
+  getPackageByIdent,
+  getWebstore
+} from "@/lib/tebex/store";
+import type {
+  BasketPackage,
+  Package,
+  PackageVariable
+} from "@/lib/tebex/types";
 import type {
   AddToBasketInput,
   BasketActionResult,
@@ -56,6 +64,21 @@ function clampQuantity(value: number): number {
   return Math.min(50, Math.max(1, Math.trunc(value)));
 }
 
+/**
+ * Tebex n'expose pas d'`ident` pour les packages d'un panier : on résout la
+ * référence réelle via le catalogue, sinon l'ID numérique (accepté par Tebex
+ * pour les packages standard).
+ */
+async function resolveBasketPackageRef(
+  item: BasketPackage
+): Promise<string | number> {
+  const ident = item.ident.trim();
+  if (ident) return ident;
+
+  const catalogPackage = await getPackageById(item.id);
+  return catalogPackage?.ident.trim() || item.id;
+}
+
 function errorMessage(error: unknown, fallback: string): string {
   if (error instanceof TebexError) {
     if (error.status === 429) {
@@ -70,7 +93,17 @@ function errorMessage(error: unknown, fallback: string): string {
 
 function isAuthError(error: unknown): boolean {
   if (error instanceof TebexError) {
-    return error.status === 401 || error.status === 403;
+    if (error.status === 401 || error.status === 403) return true;
+
+    // Tebex peut renvoyer un 422 quand le panier doit être autorisé
+    // (notamment pour la modification de quantité).
+    const detail = (error.detail ?? error.message).toLowerCase();
+    return (
+      detail.includes("login") ||
+      detail.includes("authorized") ||
+      detail.includes("authorize") ||
+      detail.includes("must be logged")
+    );
   }
 
   const message =
@@ -377,6 +410,17 @@ export async function updateQuantityAction(
       return { success: false, error: "Ton panier est vide." };
     }
 
+    if (basket.complete) {
+      await clearBasketIdentCookie();
+      revalidatePath("/cart");
+      revalidatePath("/", "layout");
+      return {
+        success: false,
+        error:
+          "Ce panier a déjà été payé. Recharge la page pour créer un nouveau panier."
+      };
+    }
+
     const item = basket.packages.find(
       (candidate) =>
         candidate.ident === reference || String(candidate.id) === reference
@@ -387,7 +431,7 @@ export async function updateQuantityAction(
 
     await updatePackageQuantityRaw(
       basket.ident,
-      item.ident || String(item.id),
+      await resolveBasketPackageRef(item),
       nextQuantity
     );
     revalidatePath("/cart");
@@ -448,6 +492,16 @@ export async function removeFromBasketAction(
       return { success: false, error: "Ton panier est vide." };
     }
 
+    if (basket.complete) {
+      await clearBasketIdentCookie();
+      revalidatePath("/cart");
+      revalidatePath("/", "layout");
+      return {
+        success: true,
+        message: "Ce panier a déjà été payé. Un nouveau panier a été préparé."
+      };
+    }
+
     const item = basket.packages.find(
       (candidate) =>
         candidate.ident === reference || String(candidate.id) === reference
@@ -456,7 +510,7 @@ export async function removeFromBasketAction(
       return { success: false, error: "Ce package n'est plus dans ton panier." };
     }
 
-    await removePackageRaw(basket.ident, item.ident || String(item.id));
+    await removePackageRaw(basket.ident, await resolveBasketPackageRef(item));
     revalidatePath("/cart");
     revalidatePath("/", "layout");
     return { success: true, message: "Package retiré du panier." };
@@ -474,6 +528,18 @@ export async function removeFromBasketAction(
       error: errorMessage(error, "Impossible de retirer ce package.")
     };
   }
+}
+
+/**
+ * Réinitialise la session panier, notamment quand Tebex a déjà encaissé le
+ * panier courant (`complete`).
+ */
+export async function startNewBasketAction(): Promise<void> {
+  await clearBasketIdentCookie();
+  await clearMockBasketCookie();
+  revalidatePath("/cart");
+  revalidatePath("/", "layout");
+  redirect("/cart");
 }
 
 function normalizeCouponCode(value: unknown): string | null {
