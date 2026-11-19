@@ -1,6 +1,12 @@
 const TEBEX_ROOT_DOMAINS = ["tebex.io", "tebex.com"] as const;
 
 /**
+ * Hôtes CDN utilisés par Tebex pour les images de packages.
+ * La distribution CloudFront est celle documentée par l'API Headless.
+ */
+const TEBEX_ASSET_HOSTS = ["dunb17ur4ymx4.cloudfront.net"] as const;
+
+/**
  * Vérifie qu'une URL est bien une URL HTTPS.
  */
 export function isHttpsUrl(value: string | null | undefined): boolean {
@@ -58,7 +64,8 @@ export function isAllowedTebexAssetUrl(
       hostname === "tebexcdn.com" ||
       hostname.endsWith(".tebexcdn.com") ||
       hostname === "tebex.com" ||
-      hostname.endsWith(".tebex.com")
+      hostname.endsWith(".tebex.com") ||
+      (TEBEX_ASSET_HOSTS as readonly string[]).includes(hostname)
     );
   } catch {
     return false;

@@ -8,6 +8,7 @@ import {
 } from "@/lib/consent-client";
 import type { PackageMedia } from "@/lib/tebex/types";
 import { Icon } from "@/components/ui/icons";
+import { ProductImage } from "@/components/ui/product-image";
 
 function youtubeEmbed(url: string): string | null {
   const watchMatch = url.match(/[?&]v=([^&]+)/);
@@ -26,10 +27,12 @@ function youtubeEmbed(url: string): string | null {
 export function PackageGallery({
   media,
   name,
+  packageRef,
   fallback
 }: {
   media: PackageMedia[];
   name: string;
+  packageRef: string;
   fallback: string;
 }) {
   const items: PackageMedia[] =
@@ -91,11 +94,12 @@ export function PackageGallery({
             <video src={current.url} controls playsInline preload="metadata" />
           )
         ) : (
-          <img
-            src={current.url || fallback}
+          <ProductImage
+            src={current.url}
+            pkg={packageRef}
             alt={name}
-            decoding="async"
             loading="eager"
+            fallback={fallback}
           />
         )}
       </div>
@@ -111,7 +115,13 @@ export function PackageGallery({
               aria-label={`Voir le média ${index + 1}`}
             >
               {item.type === "image" ? (
-                <img src={item.url} alt="" loading="lazy" decoding="async" />
+                <ProductImage
+                  src={item.url}
+                  pkg={packageRef}
+                  alt=""
+                  loading="lazy"
+                  fallback={fallback}
+                />
               ) : (
                 <span
                   style={{

@@ -10,6 +10,7 @@ import {
 import { formatCurrency } from "@/lib/format";
 import type { BasketPackage } from "@/lib/tebex/types";
 import { Icon } from "@/components/ui/icons";
+import { ProductImage } from "@/components/ui/product-image";
 import { useToast } from "@/components/ui/toast";
 
 export function CartLine({
@@ -22,7 +23,6 @@ export function CartLine({
   const router = useRouter();
   const { toast } = useToast();
   const [quantity, setQuantity] = useState(item.quantity);
-  const [imageError, setImageError] = useState(false);
   const [isPending, startTransition] = useTransition();
 
   useEffect(() => {
@@ -30,10 +30,6 @@ export function CartLine({
   }, [item.quantity]);
 
   const isSubscription = item.type === "subscription";
-  const image =
-    !item.image || imageError
-      ? "/images/package-placeholder.svg"
-      : item.image;
   const linePrice = Math.round(item.unitPrice * item.quantity * 100) / 100;
 
   function commit(nextQuantity: number) {
@@ -74,11 +70,10 @@ export function CartLine({
   return (
     <article className="cart-line">
       <Link href={`/package/${item.slug}`} className="cart-line__media">
-        <img
-          src={image}
+        <ProductImage
+          src={item.image}
+          pkg={item.ident || String(item.id)}
           alt={item.name}
-          decoding="async"
-          onError={() => setImageError(true)}
         />
       </Link>
 

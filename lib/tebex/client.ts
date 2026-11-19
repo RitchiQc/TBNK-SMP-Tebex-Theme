@@ -143,6 +143,18 @@ export async function getPackageRaw(id: number): Promise<unknown | null> {
   });
 }
 
+/**
+ * Lookup sans cache : utilisé par le proxy d'images lorsqu'une URL de média
+ * mise en cache ne répond plus (image remplacée dans Tebex).
+ */
+export async function getPackageRawFresh(
+  ref: string | number
+): Promise<unknown | null> {
+  return request(accountUrl(`/packages/${encodeURIComponent(String(ref))}`), {
+    notFound: [400, 404, 422]
+  });
+}
+
 /* -------------------------------------------------------------------------- */
 /* Panier                                                                      */
 /* -------------------------------------------------------------------------- */

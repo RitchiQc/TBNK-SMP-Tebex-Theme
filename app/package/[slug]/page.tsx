@@ -13,10 +13,25 @@ import {
   getPackageBySlugSafe,
   getStoreDataSafe
 } from "@/lib/tebex/store";
+import type { Package } from "@/lib/tebex/types";
 
 type PageProps = {
   params: Promise<{ slug: string }>;
 };
+
+/**
+ * URL absolue du proxy first-party : les crawlers sociaux et le JSON-LD
+ * obtiennent toujours une image à jour, même si l'URL Tebex a changé.
+ */
+function packageImageUrl(pkg: Package): string | null {
+  if (!pkg.ident && !pkg.image) return null;
+
+  const params = new URLSearchParams();
+  if (pkg.image) params.set("src", pkg.image);
+  if (pkg.ident) params.set("pkg", pkg.ident);
+
+  return `${siteConfig.url}/api/image?${params.toString()}`;
+}
 
 export async function generateMetadata({
   params
@@ -30,6 +45,7 @@ export async function generateMetadata({
 
   const { pkg } = result;
   const description = truncate(stripHtml(pkg.description), 160);
+  const image = pkg.image ? packageImageUrl(pkg) : null;
 
   return {
     title: pkg.name,
@@ -40,7 +56,7 @@ export async function generateMetadata({
     openGraph: {
       title: `${pkg.name} — ${siteConfig.name}`,
       description,
-      images: pkg.image ? [{ url: pkg.image }] : undefined
+      images: image ? [{ url: image }] : undefined
     }
   };
 }
@@ -70,6 +86,7 @@ export default async function PackagePage({ params }: PageProps) {
   }
 
   const { pkg, category } = result;
+  const packageImage = packageImageUrl(pkg);
   const currency = pkg.currency || webstore.currency || siteConfig.currency;
   const inBasketQuantity =
     basket?.packages.find((item) => item.id === pkg.id)?.quantity ?? 0;
@@ -88,7 +105,10 @@ export default async function PackagePage({ params }: PageProps) {
     "@type": "Product",
     name: pkg.name,
     description: stripHtml(pkg.description),
-    image: pkg.image || `${siteConfig.url}${siteConfig.banner}`,
+    image:
+      pkg.image && packageImage
+        ? packageImage
+        : `${siteConfig.url}${siteConfig.banner}`,
     category: category.name,
     offers: {
       "@type": "Offer",
@@ -158,6 +178,7 @@ export default async function PackagePage({ params }: PageProps) {
             <PackageGallery
               media={pkg.media}
               name={pkg.name}
+              packageRef={pkg.ident}
               fallback="/images/package-placeholder.svg"
             />
 

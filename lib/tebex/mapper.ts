@@ -106,6 +106,21 @@ function mapMedia(raw: unknown): PackageMedia[] {
   return media;
 }
 
+/**
+ * Choisit l'image à afficher sur une carte produit.
+ * Une vidéo ne doit jamais devenir `pkg.image`, sinon le `<img>` échoue et
+ * affiche le placeholder alors que le package possède une image.
+ */
+function pickPrimaryImage(media: PackageMedia[]): string | null {
+  const images = media.filter((item) => item.type === "image");
+  return (
+    images.find((item) => item.primary)?.url ??
+    images.find((item) => item.featured)?.url ??
+    images[0]?.url ??
+    null
+  );
+}
+
 function mapVariableOptions(raw: unknown): PackageVariableOption[] {
   if (!Array.isArray(raw)) return [];
   return raw
@@ -179,7 +194,7 @@ export function mapPackage(
   const source = isRecord(raw) ? raw : {};
   const id = toNum(source.id);
   const media = mapMedia(source.media);
-  const image = toHttpsUrl(source.image) ?? media[0]?.url ?? null;
+  const image = toHttpsUrl(source.image) ?? pickPrimaryImage(media);
   const basePrice = toNum(source.base_price);
   const totalPrice = toNum(source.total_price, basePrice);
   const discount = Math.max(0, basePrice - totalPrice, toNum(source.discount));

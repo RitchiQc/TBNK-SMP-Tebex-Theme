@@ -29,6 +29,7 @@ Captures générées en **mode démo**, avec les données et les visuels de seco
 - Page d’accueil “menu principal” simple : hero, bannière, IP Java copiable et 4 tuiles (Boutique, Discord, Statut, Guide).
 - Page Guide dédiée pour rejoindre le serveur (Java uniquement).
 - Boutique complète : catégories, recherche, tri, grille responsive, prix CAD, badges promo/populaire.
+- Images de packages servies via un proxy first-party (`/api/image`) : le navigateur ne contacte plus directement le CDN Tebex, avec fallback frais si l’URL d’un média a changé et placeholder en dernier recours.
 - Fiches packages : galerie, description riche, options/variables, quantité, abonnement ou achat unique.
 - Panier : quantités, suppression, code promo, total, checkout Tebex. Les prix de ligne sont calculés à partir du prix unitaire Tebex × quantité ; un panier payé est vidé automatiquement (événement `payment:complete` de Tebex.js + route `/api/checkout/success`), avec un filet de sécurité si Tebex ne redirige pas.
 - Connexion pseudo Minecraft Java, panier conservé en cookie httpOnly.
@@ -300,6 +301,7 @@ app/
 ├─ guide/page.tsx          # comment rejoindre le serveur
 ├─ legal/[slug]/page.tsx   # pages légales
 ├─ api/avatar/[username]/route.ts # proxy avatar first-party + cache
+├─ api/image/route.ts       # proxy images Tebex first-party + fallback frais
 ├─ sitemap.ts, robots.ts, opengraph-image.tsx
 components/
 ├─ layout/                 # header, menu mobile, footer
@@ -371,6 +373,8 @@ Si Edge n’est pas au chemin par défaut, définis `EDGE_PATH`.
 
 ### Ce que teste le parcours e2e
 
+- chargement de toutes les images de la boutique avant et après un reload ;
+- rejet par `/api/image` d’un hôte non Tebex ;
 - ajout d’un package avec quantité 5 ;
 - compteur du panier ;
 - prix de ligne = prix unitaire × quantité (et prix unitaire affiché) ;
@@ -407,6 +411,7 @@ Si Edge n’est pas au chemin par défaut, définis `EDGE_PATH`.
 - Les réponses d’erreur Tebex ne sont pas renvoyées telles quelles au client.
 - Une CSP complète est configurée (scripts, styles, images, frames, connect, form-action, frame-ancestors), avec `X-Frame-Options`, `nosniff`, HSTS et `Referrer-Policy`.
 - Tebex.js n’est chargé qu’au clic sur « Passer au paiement » ; YouTube est soumis au consentement. Les avatars Minecraft sont servis par la route first-party `/api/avatar/[username]` : résolution du pseudo en UUID via Mojang/Microsoft, fallback minotar/mc-heads, cache serveur de 24 h et 404 pour les comptes inexistants. Aucune requête du navigateur vers ces services.
+- Les images de packages passent par `/api/image` : allowlist stricte des hôtes Tebex (`*.tebex.io`, `*.tebexcdn.com`, `cdn.tebex.io`, `dunb17ur4ymx4.cloudfront.net`), HTTPS uniquement, timeout, taille maximale, cache mémoire et rate limiting. Une URL de média périmée déclenche une relecture sans cache du package via l’API Tebex (aucun SSRF possible).
 - Le rate limiting fourni est best-effort et local à l’instance ; pour un déploiement multi-instance, ajouter Vercel WAF ou Upstash. `TRUST_PROXY` doit être configuré en self-hosted.
 - Les prix et la disponibilité sont lus depuis Tebex ; le site ne fait pas confiance à un prix envoyé par le client.
 - Les textes légaux et la mention **Tebex merchant of record** sont inclus dans le footer. Ne les supprime pas sans raison légale.

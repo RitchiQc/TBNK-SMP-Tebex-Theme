@@ -40,10 +40,42 @@ page.on("pageerror", (error) => errors.push(error.message));
 
 const checks = {};
 
+async function loadAllLazyImages(page) {
+  await page.evaluate(async () => {
+    const step = 600;
+    for (let y = 0; y < document.body.scrollHeight; y += step) {
+      window.scrollTo(0, y);
+      await new Promise((resolve) => setTimeout(resolve, 40));
+    }
+    await new Promise((resolve) => setTimeout(resolve, 400));
+  });
+}
+
+async function productImagesLoaded(page) {
+  return page.evaluate(() =>
+    Array.from(document.querySelectorAll("img.product-card__img")).every(
+      (image) =>
+        image instanceof HTMLImageElement &&
+        image.complete &&
+        image.naturalWidth > 0
+    )
+  );
+}
+
 try {
   await page.goto(`${BASE_URL}/store/cles-coffres`, {
     waitUntil: "networkidle"
   });
+
+  await loadAllLazyImages(page);
+  await page.waitForTimeout(300);
+  checks.storeImageCount = await page.locator("img.product-card__img").count();
+  checks.storeImagesBeforeReload = await productImagesLoaded(page);
+
+  await page.reload({ waitUntil: "networkidle" });
+  await loadAllLazyImages(page);
+  await page.waitForTimeout(300);
+  checks.storeImagesAfterReload = await productImagesLoaded(page);
 
   const primeCard = page
     .locator(".product-card")
@@ -138,6 +170,23 @@ try {
         image.naturalWidth > 0
     )
     .catch(() => false);
+  const foreignHost = await page.request.get(
+    `${BASE_URL}/api/image?src=${encodeURIComponent("https://example.com/pixel.png")}`
+  );
+  checks.proxyRejectsForeignHost = foreignHost.status() === 404;
+
+  if (process.env.TEST_IMAGE_PROXY === "1") {
+    const tebexImage =
+      "https://dunb17ur4ymx4.cloudfront.net/packages/images/e16e574a643131793423e8adbfd80e538d86425e.png";
+    const proxy = await page.request.get(
+      `${BASE_URL}/api/image?src=${encodeURIComponent(tebexImage)}`
+    );
+    checks.proxyStatus = proxy.status();
+    checks.proxyContentType = proxy.headers()["content-type"] ?? null;
+    checks.proxyWorks =
+      proxy.status() === 200 &&
+      (checks.proxyContentType ?? "").startsWith("image/");
+  }
 } catch (error) {
   checks.error = error instanceof Error ? error.message : String(error);
 }
@@ -147,6 +196,11 @@ console.log(JSON.stringify(checks, null, 2));
 
 const passed =
   !checks.error &&
+  checks.storeImageCount >= 1 &&
+  checks.storeImagesBeforeReload === true &&
+  checks.storeImagesAfterReload === true &&
+  checks.proxyRejectsForeignHost === true &&
+  (process.env.TEST_IMAGE_PROXY === "1" ? checks.proxyWorks === true : true) &&
   checks.cartLines === 1 &&
   checks.quantity === "5" &&
   typeof checks.linePrice === "string" &&

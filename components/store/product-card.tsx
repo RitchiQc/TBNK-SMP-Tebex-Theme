@@ -8,6 +8,7 @@ import { formatCurrency } from "@/lib/format";
 import { siteConfig } from "@/lib/site";
 import type { Package } from "@/lib/tebex/types";
 import { Icon } from "@/components/ui/icons";
+import { ProductImage } from "@/components/ui/product-image";
 import { useToast } from "@/components/ui/toast";
 
 const quantityOptions = [1, 5, 10, 20];
@@ -26,15 +27,10 @@ export function ProductCard({
   const router = useRouter();
   const { toast } = useToast();
   const [quantity, setQuantity] = useState(1);
-  const [imageError, setImageError] = useState(false);
   const [isPending, startTransition] = useTransition();
 
   const isSubscription = pkg.type === "subscription" || pkg.type === "both";
   const needsConfiguration = pkg.variables.length > 0;
-  const image =
-    !pkg.image || imageError
-      ? "/images/package-placeholder.svg"
-      : pkg.image;
 
   function addToBasket() {
     startTransition(async () => {
@@ -83,13 +79,12 @@ export function ProductCard({
             <span className="badge badge-muted">Abonnement</span>
           ) : null}
         </div>
-        <img
+        <ProductImage
           className="product-card__img"
-          src={image}
+          src={pkg.image}
+          pkg={pkg.ident}
           alt={pkg.name}
-          decoding="async"
           loading="lazy"
-          onError={() => setImageError(true)}
         />
       </Link>
 
