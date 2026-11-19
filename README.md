@@ -30,7 +30,7 @@ Captures générées en **mode démo**, avec les données et les visuels de seco
 - Page Guide dédiée pour rejoindre le serveur (Java uniquement).
 - Boutique complète : catégories, recherche, tri, grille responsive, prix CAD, badges promo/populaire.
 - Fiches packages : galerie, description riche, options/variables, quantité, abonnement ou achat unique.
-- Panier : quantités, suppression, code promo, total, checkout Tebex. Les prix de ligne sont calculés à partir du prix unitaire Tebex × quantité ; un panier déjà payé est automatiquement réinitialisé.
+- Panier : quantités, suppression, code promo, total, checkout Tebex. Les prix de ligne sont calculés à partir du prix unitaire Tebex × quantité ; un panier payé est vidé automatiquement (événement `payment:complete` de Tebex.js + route `/api/checkout/success`), avec un filet de sécurité si Tebex ne redirige pas.
 - Connexion pseudo Minecraft Java, panier conservé en cookie httpOnly.
 - Avatars Minecraft affichés via un proxy first-party (`/api/avatar`) : résolution du pseudo en UUID via Mojang/Microsoft, fallback minotar/mc-heads, cache 24 h et initiales pour les comptes inexistants.
 - Mode démo complet sans boutique Tebex, avec produits fictifs et panier simulé.
@@ -332,9 +332,9 @@ scripts/
 2. En mode réel, le pseudo Minecraft est requis avant l’ajout. S’il manque, l’action stocke l’ajout en attente et redirige vers `/login`.
 3. Le panier Tebex est créé côté serveur avec `username`, puis stocké dans un cookie httpOnly.
 4. Les quantités et suppressions passent par des Server Actions. La référence envoyée à Tebex est l’`ident` réel (résolu via le catalogue) ou l’ID numérique, jamais un ident fabriqué.
-5. Un panier marqué `complete` par Tebex n’est jamais réutilisé : le site le remplace par un panier neuf et affiche une bannière « panier déjà payé ».
+5. Un panier marqué `complete` par Tebex n’est jamais réutilisé : la page `/cart` déclenche automatiquement `/api/checkout/success`, qui efface les cookies du panier et redirige vers l’accueil avec le message de confirmation. Un nouvel ajout repart aussi sur un panier neuf.
 6. Le code promo est appliqué via l’API Headless.
-7. Le checkout utilise **Tebex.js**. En cas d’échec, le site redirige vers `basket.links.checkout`.
+7. Le checkout utilise **Tebex.js**. La fin de paiement est détectée via l’événement `payment:complete`, qui redirige vers `/api/checkout/success` (vidage du panier). En cas d’échec de Tebex.js, le site redirige vers `basket.links.checkout` et Tebex applique `complete_url` / `complete_auto_redirect`.
 
 ### API Tebex
 
@@ -394,6 +394,7 @@ Si Edge n’est pas au chemin par défaut, définis `EDGE_PATH`.
    - l’ajout au panier fonctionne avec un pseudo Minecraft ;
    - le panier persiste ;
    - le checkout Tebex s’ouvre ;
+   - après un paiement de test, le retour affiche `/?checkout=success`, le badge panier est à 0 et `/cart` est vide ;
    - un petit achat de test est livré en jeu.
 7. Vérifier les pages légales et le footer Tebex.
 8. Vérifier le domaine et le HTTPS sur Vercel ou OVHcloud.

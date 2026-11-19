@@ -3,6 +3,7 @@ import Link from "next/link";
 import { CartLine } from "@/components/cart/cart-line";
 import { CheckoutButton } from "@/components/cart/checkout-button";
 import { CouponForm } from "@/components/cart/coupon-form";
+import { PaidBasketCleaner } from "@/components/cart/paid-basket-cleaner";
 import { Icon } from "@/components/ui/icons";
 import { startNewBasketAction } from "@/lib/basket/actions";
 import { getBasketIdentCookie } from "@/lib/basket/cookies";
@@ -30,7 +31,7 @@ export default async function CartPage() {
 
   const currency = basket?.currency || siteConfig.currency;
   const paidBasket = Boolean(basket?.complete);
-  const isEmpty = !basket || basket.packages.length === 0;
+  const isEmpty = !basket || basket.packages.length === 0 || paidBasket;
   const cartUnavailable = Boolean(basketIdent) && !basket;
   const unavailable = store.unavailable || cartUnavailable;
 
@@ -70,6 +71,8 @@ export default async function CartPage() {
       </section>
 
       <div className="container-tbnk" style={{ paddingBottom: 30 }}>
+        {paidBasket ? <PaidBasketCleaner /> : null}
+
         {unavailable ? (
           <div className="cart-login-banner" style={{ marginBottom: 16 }}>
             <p>
@@ -97,17 +100,21 @@ export default async function CartPage() {
         {isEmpty ? (
           <div className="empty-state">
             <span className="empty-state__icon">
-              <Icon name="cart" size={26} />
+              <Icon name={paidBasket ? "check-circle" : "cart"} size={26} />
             </span>
             <h2>
               {unavailable
                 ? "Impossible de charger ton panier"
-                : "Ton panier est vide"}
+                : paidBasket
+                  ? "Paiement complété"
+                  : "Ton panier est vide"}
             </h2>
             <p>
               {unavailable
                 ? "Réessaie dans quelques instants. Si le problème persiste, contacte le support Discord."
-                : "Parcours la boutique et ajoute un rang, une clé ou un cosmétique pour commencer."}
+                : paidBasket
+                  ? "Merci pour ton achat ! Ton panier a été vidé et la livraison en jeu est automatique pour les articles éligibles."
+                  : "Parcours la boutique et ajoute un rang, une clé ou un cosmétique pour commencer."}
             </p>
             <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
               <Link href="/store" className="btn btn-primary btn-sm">

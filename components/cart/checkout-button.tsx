@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useTransition } from "react";
+import { useCallback, useEffect, useRef, useState, useTransition } from "react";
 import {
   clearDemoBasketAction,
   prepareCheckoutAction
@@ -21,6 +21,19 @@ export function CheckoutButton({
   const { toast } = useToast();
   const [demoOpen, setDemoOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
+  const completedRef = useRef(false);
+
+  const handlePaymentComplete = useCallback(() => {
+    if (completedRef.current) return;
+    completedRef.current = true;
+    window.location.assign("/api/checkout/success");
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      window.Tebex?.checkout?.off?.("payment:complete", handlePaymentComplete);
+    };
+  }, [handlePaymentComplete]);
 
   useEffect(() => {
     if (!demoOpen) return;
@@ -56,15 +69,22 @@ export function CheckoutButton({
           const scriptLoaded = await loadTebexScript();
 
           if (scriptLoaded && window.Tebex?.checkout) {
+            const tebexCheckout = window.Tebex.checkout;
             try {
-              window.Tebex.checkout.init({
+              completedRef.current = false;
+              tebexCheckout.off?.("payment:complete", handlePaymentComplete);
+              tebexCheckout.on?.("payment:complete", handlePaymentComplete);
+
+              tebexCheckout.init({
                 ident: result.ident,
                 theme: "dark",
-                colors: [{ name: "primary", color: siteConfig.accent }]
+                colors: [{ name: "primary", color: siteConfig.accent }],
+                closeOnPaymentComplete: true
               });
-              window.Tebex.checkout.launch();
+              tebexCheckout.launch();
               return;
             } catch {
+              tebexCheckout.off?.("payment:complete", handlePaymentComplete);
               // Fallback vers l'URL de checkout hébergée ci-dessous.
             }
           }

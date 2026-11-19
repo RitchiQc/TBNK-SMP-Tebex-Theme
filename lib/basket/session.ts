@@ -197,7 +197,7 @@ export async function getHeaderBasket(): Promise<{
   try {
     const basket = await getCurrentBasket();
     return {
-      count: basketItemCount(basket),
+      count: basket?.complete ? 0 : basketItemCount(basket),
       username: basket?.username ?? (await getUsernameCookie()),
       isMock: isMockMode
     };

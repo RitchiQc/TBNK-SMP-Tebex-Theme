@@ -262,6 +262,20 @@ try {
   });
   const successUrl = checkoutPage.url();
 
+  const successPost = await fetch(`${BASE_URL}/api/checkout/success`, {
+    method: "POST",
+    redirect: "manual"
+  });
+  results.checkoutSuccessPost = {
+    status: successPost.status,
+    location: successPost.headers.get("location")
+  };
+  if (successPost.status !== 303) {
+    failures.push(
+      `checkout POST : attendu 303, reçu ${successPost.status}`
+    );
+  }
+
   await checkoutPage.goto(`${BASE_URL}/cart`, { waitUntil: "networkidle" });
   const linesAfter = await checkoutPage.locator(".cart-line").count();
 
